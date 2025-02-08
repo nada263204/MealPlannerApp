@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1050721793701",
+    "project_id": "todo-5ed46",
+    "storage_bucket": "todo-5ed46.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1050721793701:android:a40b7136c133f9425cbf4c",
+        "android_client_info": {
+          "package_name": "com.example.mealplannerapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJbiIaRv04wahHx3XCfAVz6TVDJM0v04c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1050721793701:android:277204edfeb970585cbf4c",
+        "android_client_info": {
+          "package_name": "com.example.todo_application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJbiIaRv04wahHx3XCfAVz6TVDJM0v04c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
