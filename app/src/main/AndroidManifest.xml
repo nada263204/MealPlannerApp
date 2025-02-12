@@ -15,7 +15,7 @@
         android:theme="@style/Theme.MealPlannerApp"
         tools:targetApi="31">
         <activity
-            android:name=".MealDetailActivity"
+            android:name=".SplashActivity"
             android:exported="false" />
         <activity
             android:name=".DashboardActivity"
@@ -32,6 +32,7 @@
         <activity
             android:name=".SignUpActivity"
             android:exported="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">

@@ -2,14 +2,18 @@ package com.example.mealplannerapp;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 
@@ -21,36 +25,41 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MealDetailActivity extends AppCompatActivity {
-
+public class MealDetailsFragment extends Fragment {
     private ImageView mealImage;
     private TextView mealName, mealCategoryArea, mealInstructions, mealIngredients;
     private Button playVideoButton;
+    private WebView youtubeWebView;
 
     public static final String BASE_URL = "https://www.themealdb.com/api/json/v1/1/";
-    private static final String TAG = "MealDetailActivity";
+    private static final String TAG = "MealDetailsFragment";
+    private String mealId;
 
+    public MealDetailsFragment() {
+        // Required empty public constructor
+    }
+
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_meal_detail);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_meal_details, container, false);
 
+        mealImage = view.findViewById(R.id.mealImage);
+        mealName = view.findViewById(R.id.mealName);
+        mealCategoryArea = view.findViewById(R.id.mealCategoryArea);
+        mealInstructions = view.findViewById(R.id.mealInstructions);
+        mealIngredients = view.findViewById(R.id.mealIngredients);
+        playVideoButton = view.findViewById(R.id.playVideoButton);
+        youtubeWebView = view.findViewById(R.id.youtubeWebView);
 
-        mealImage = findViewById(R.id.mealImage);
-        mealName = findViewById(R.id.mealName);
-        mealCategoryArea = findViewById(R.id.mealCategoryArea);
-        mealInstructions = findViewById(R.id.mealInstructions);
-        mealIngredients = findViewById(R.id.mealIngredients);
-        playVideoButton = findViewById(R.id.playVideoButton);
-
-
-        String mealId = getIntent().getStringExtra("MEAL_ID");
-
-        if (mealId != null && !mealId.isEmpty()) {
+        if (getArguments() != null) {
+            mealId = getArguments().getString("MEAL_ID");
             fetchMeal(mealId);
         } else {
-            Toast.makeText(this, "Meal ID is missing", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Meal ID is missing", Toast.LENGTH_SHORT).show();
         }
+
+        return view;
     }
 
     private void fetchMeal(String mealId) {
@@ -74,7 +83,7 @@ public class MealDetailActivity extends AppCompatActivity {
                         mealCategoryArea.setText(meal.getStrCategory() + " - " + meal.getStrArea());
                         mealInstructions.setText(meal.getStrInstructions());
 
-                        Glide.with(MealDetailActivity.this)
+                        Glide.with(requireContext())
                                 .load(meal.getStrMealThumb())
                                 .into(mealImage);
 
@@ -92,8 +101,6 @@ public class MealDetailActivity extends AppCompatActivity {
                             playVideoButton.setOnClickListener(v -> {
                                 String videoId = meal.getStrYoutube().split("v=")[1];
                                 String embedUrl = "https://www.youtube.com/embed/" + videoId + "?autoplay=1";
-
-                                WebView youtubeWebView = findViewById(R.id.youtubeWebView);
                                 youtubeWebView.getSettings().setJavaScriptEnabled(true);
                                 youtubeWebView.loadUrl(embedUrl);
                                 youtubeWebView.setVisibility(View.VISIBLE);
@@ -102,19 +109,18 @@ public class MealDetailActivity extends AppCompatActivity {
                             playVideoButton.setEnabled(false);
                             playVideoButton.setText("No Video Available");
                         }
-
                     } else {
-                        Toast.makeText(MealDetailActivity.this, "No meal found", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "No meal found", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(MealDetailActivity.this, "No meal found", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "No meal found", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<MealResponse> call, Throwable throwable) {
                 Log.e(TAG, "API Error", throwable);
-                Toast.makeText(MealDetailActivity.this, "Failed to fetch data", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Failed to fetch data", Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -3,6 +3,7 @@ package com.example.mealplannerapp;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -13,13 +14,17 @@ public class DashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
+        ConstraintLayout layout = findViewById(R.id.main_layout);
+        layout.setBackgroundResource(R.drawable.background);
+
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
         String username = getIntent().getStringExtra("USERNAME");
 
-        HomeFragment homeFragment = new HomeFragment();
         Bundle bundle = new Bundle();
         bundle.putString("USERNAME", username);
+
+        HomeFragment homeFragment = new HomeFragment();
         homeFragment.setArguments(bundle);
 
         getSupportFragmentManager().beginTransaction()
@@ -50,5 +55,4 @@ public class DashboardActivity extends AppCompatActivity {
             return true;
         });
     }
-
 }

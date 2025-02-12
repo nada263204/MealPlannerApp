@@ -1,64 +1,90 @@
 package com.example.mealplannerapp;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SearchFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class SearchFragment extends Fragment {
+    private RecyclerView ingredientsRecyclerView;
+    private RecyclerView countriesRecyclerView;
+    private IngredientsRecyclerViewAdapter ingredientsAdapter;
+    private CountriesRecyclerViewAdapter countriesAdapter;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    public SearchFragment() {}
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public SearchFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SearchFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SearchFragment newInstance(String param1, String param2) {
-        SearchFragment fragment = new SearchFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_search, container, false);
+
+        ingredientsRecyclerView = view.findViewById(R.id.ingredientsRecyclerView);
+        ingredientsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+
+        countriesRecyclerView = view.findViewById(R.id.countriesRecyclerView);
+        countriesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+
+        fetchIngredients();
+        fetchCountries();
+        return view;
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_search, container, false);
+    private void fetchIngredients() {
+        IngredientService ingredientService = ApiClient.getClient().create(IngredientService.class);
+        Call<IngredientResponse> call = ingredientService.getIngredients();
+
+        call.enqueue(new Callback<IngredientResponse>() {
+            @Override
+            public void onResponse(Call<IngredientResponse> call, Response<IngredientResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Ingredient> ingredientsList = response.body().getMeals();
+                    ingredientsAdapter = new IngredientsRecyclerViewAdapter(ingredientsList);
+                    ingredientsRecyclerView.setAdapter(ingredientsAdapter);
+                } else {
+                    Toast.makeText(getContext(), "Failed to get ingredients", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<IngredientResponse> call, Throwable t) {
+                Toast.makeText(getContext(), "API Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fetchCountries() {
+        CountryService countryService = ApiClient.getClient().create(CountryService.class);
+        Call<CountryRespsonse> call = countryService.getCountries();
+
+        call.enqueue(new Callback<CountryRespsonse>() {
+            @Override
+            public void onResponse(Call<CountryRespsonse> call, Response<CountryRespsonse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Country> countriesList = response.body().getMeals();
+                    countriesAdapter = new CountriesRecyclerViewAdapter(countriesList);
+                    countriesRecyclerView.setAdapter(countriesAdapter);
+                } else {
+                    Toast.makeText(getContext(), "Failed to get countries", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CountryRespsonse> call, Throwable t) {
+                Toast.makeText(getContext(), "API Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
