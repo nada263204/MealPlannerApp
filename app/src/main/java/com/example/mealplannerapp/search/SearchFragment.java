@@ -1,28 +1,39 @@
-package com.example.mealplannerapp;
+package com.example.mealplannerapp.search;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.example.mealplannerapp.ApiClient;
+import com.example.mealplannerapp.R;
+import com.example.mealplannerapp.search.categories.CategoriesRecyclerViewAdapter;
+import com.example.mealplannerapp.search.categories.Category;
+import com.example.mealplannerapp.search.categories.CategoriesResponse;
+import com.example.mealplannerapp.search.categories.CategoriesService;
+import com.example.mealplannerapp.search.countries.CountriesRecyclerViewAdapter;
+import com.example.mealplannerapp.search.countries.Country;
+import com.example.mealplannerapp.search.countries.CountryRespsonse;
+import com.example.mealplannerapp.search.countries.CountryService;
+import com.example.mealplannerapp.search.ingedients.Ingredient;
+import com.example.mealplannerapp.search.ingedients.IngredientResponse;
+import com.example.mealplannerapp.search.ingedients.IngredientService;
+import com.example.mealplannerapp.search.ingedients.IngredientsRecyclerViewAdapter;
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class SearchFragment extends Fragment {
-    private RecyclerView ingredientsRecyclerView;
-    private RecyclerView countriesRecyclerView;
+    private RecyclerView ingredientsRecyclerView, countriesRecyclerView, categoriesRecyclerView;
     private IngredientsRecyclerViewAdapter ingredientsAdapter;
     private CountriesRecyclerViewAdapter countriesAdapter;
+    private CategoriesRecyclerViewAdapter categoriesAdapter;
 
     public SearchFragment() {}
 
@@ -37,8 +48,13 @@ public class SearchFragment extends Fragment {
         countriesRecyclerView = view.findViewById(R.id.countriesRecyclerView);
         countriesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
+        categoriesRecyclerView = view.findViewById(R.id.categoriesRecyclerView);
+        categoriesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+
         fetchIngredients();
         fetchCountries();
+        fetchCategories();
+
         return view;
     }
 
@@ -83,6 +99,29 @@ public class SearchFragment extends Fragment {
 
             @Override
             public void onFailure(Call<CountryRespsonse> call, Throwable t) {
+                Toast.makeText(getContext(), "API Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fetchCategories() {
+        CategoriesService categoriesService = ApiClient.getClient().create(CategoriesService.class);
+        Call<CategoriesResponse> call = categoriesService.getCategories();
+
+        call.enqueue(new Callback<CategoriesResponse>() {
+            @Override
+            public void onResponse(Call<CategoriesResponse> call, Response<CategoriesResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Category> categoriesList = response.body().getCategories();
+                    categoriesAdapter = new CategoriesRecyclerViewAdapter(categoriesList);
+                    categoriesRecyclerView.setAdapter(categoriesAdapter);
+                } else {
+                    Toast.makeText(getContext(), "Failed to get categories", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CategoriesResponse> call, Throwable t) {
                 Toast.makeText(getContext(), "API Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

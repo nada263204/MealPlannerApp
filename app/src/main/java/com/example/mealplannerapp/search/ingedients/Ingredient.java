@@ -1,4 +1,4 @@
-package com.example.mealplannerapp;
+package com.example.mealplannerapp.search.ingedients;
 
 public class Ingredient {
     private String idIngredient;

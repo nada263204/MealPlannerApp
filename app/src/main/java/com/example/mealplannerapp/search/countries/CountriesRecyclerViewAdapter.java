@@ -1,4 +1,4 @@
-package com.example.mealplannerapp;
+package com.example.mealplannerapp.search.countries;
 
 
 import android.view.LayoutInflater;
@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.example.mealplannerapp.R;
 
 import java.util.List;
 
@@ -53,8 +54,8 @@ public class CountriesRecyclerViewAdapter extends RecyclerView.Adapter<Countries
 
         public CountryViewHolder(View itemView) {
             super(itemView);
-            tvCountryName = itemView.findViewById(R.id.ingredientName);
-            ivCountryFlag = itemView.findViewById(R.id.ingredientImage);
+            tvCountryName = itemView.findViewById(R.id.categoryName);
+            ivCountryFlag = itemView.findViewById(R.id.categoryImage);
         }
     }
 }

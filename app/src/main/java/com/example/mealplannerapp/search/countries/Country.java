@@ -1,4 +1,4 @@
-package com.example.mealplannerapp;
+package com.example.mealplannerapp.search.countries;
 
 public class Country {
     private String strArea;

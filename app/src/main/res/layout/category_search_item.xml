@@ -27,13 +27,13 @@
         android:id="@+id/categoryName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ingredient"
-        android:textSize="14sp"
-        android:textColor="@android:color/black"
         android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/ingredientCard"
-        app:layout_constraintStart_toStartOf="parent"
+        android:paddingTop="4dp"
+        android:text="Category"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
-        android:paddingTop="4dp"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ingredientCard" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

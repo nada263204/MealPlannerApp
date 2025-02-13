@@ -1,4 +1,4 @@
-package com.example.mealplannerapp;
+package com.example.mealplannerapp.search.ingedients;
 import retrofit2.Call;
 import retrofit2.http.GET;
 

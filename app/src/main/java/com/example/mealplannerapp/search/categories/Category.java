@@ -1,4 +1,4 @@
-package com.example.mealplannerapp;
+package com.example.mealplannerapp.search.categories;
 
 public class Category {
     private String idCategory;

@@ -1,4 +1,6 @@
-package com.example.mealplannerapp;
+package com.example.mealplannerapp.Home;
+
+import com.example.mealplannerapp.Meal;
 
 import java.util.List;
 

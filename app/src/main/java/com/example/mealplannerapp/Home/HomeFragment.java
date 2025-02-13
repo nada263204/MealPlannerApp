@@ -1,4 +1,4 @@
-package com.example.mealplannerapp;
+package com.example.mealplannerapp.Home;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -13,6 +13,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
+import com.example.mealplannerapp.Meal;
+import com.example.mealplannerapp.MealDetailsFragment;
+import com.example.mealplannerapp.R;
+
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;

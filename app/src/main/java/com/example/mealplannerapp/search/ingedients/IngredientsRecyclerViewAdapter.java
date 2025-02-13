@@ -1,4 +1,4 @@
-package com.example.mealplannerapp;
+package com.example.mealplannerapp.search.ingedients;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +15,7 @@ import java.util.List;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.example.mealplannerapp.R;
 
 
 public class IngredientsRecyclerViewAdapter extends RecyclerView.Adapter<IngredientsRecyclerViewAdapter.IngredientViewHolder> {
@@ -55,8 +56,8 @@ public class IngredientsRecyclerViewAdapter extends RecyclerView.Adapter<Ingredi
 
         public IngredientViewHolder(View itemView) {
             super(itemView);
-            tvIngredientName = itemView.findViewById(R.id.ingredientName);
-            ivIngredientImage = itemView.findViewById(R.id.ingredientImage);
+            tvIngredientName = itemView.findViewById(R.id.categoryName);
+            ivIngredientImage = itemView.findViewById(R.id.categoryImage);
         }
     }
 }
