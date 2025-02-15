@@ -10,30 +10,37 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.mealplannerapp.ApiClient;
-import com.example.mealplannerapp.R;
-import com.example.mealplannerapp.search.categories.CategoriesRecyclerViewAdapter;
-import com.example.mealplannerapp.search.categories.Category;
-import com.example.mealplannerapp.search.categories.CategoriesResponse;
-import com.example.mealplannerapp.search.categories.CategoriesService;
-import com.example.mealplannerapp.search.countries.CountriesRecyclerViewAdapter;
-import com.example.mealplannerapp.search.countries.Country;
-import com.example.mealplannerapp.search.countries.CountryRespsonse;
-import com.example.mealplannerapp.search.countries.CountryService;
-import com.example.mealplannerapp.search.ingedients.Ingredient;
-import com.example.mealplannerapp.search.ingedients.IngredientResponse;
-import com.example.mealplannerapp.search.ingedients.IngredientService;
-import com.example.mealplannerapp.search.ingedients.IngredientsRecyclerViewAdapter;
-import java.util.List;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
-public class SearchFragment extends Fragment {
+import com.example.mealplannerapp.R;
+import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
+import com.example.mealplannerapp.data.repo.Repository;
+import com.example.mealplannerapp.search.categories.presenter.CategoriesPresenter;
+import com.example.mealplannerapp.search.categories.presenter.CategoriesPresenterImpl;
+import com.example.mealplannerapp.search.categories.view.CategoriesRecyclerViewAdapter;
+import com.example.mealplannerapp.search.categories.models.Category;
+import com.example.mealplannerapp.search.categories.view.CategoriesView;
+import com.example.mealplannerapp.search.countries.presenter.CountriesPresenter;
+import com.example.mealplannerapp.search.countries.presenter.CountriesPresenterImpl;
+import com.example.mealplannerapp.search.countries.view.CountriesRecyclerViewAdapter;
+import com.example.mealplannerapp.search.countries.models.Country;
+import com.example.mealplannerapp.search.countries.view.CountriesView;
+import com.example.mealplannerapp.search.ingedients.models.Ingredient;
+import com.example.mealplannerapp.search.ingedients.presenter.IngredientPresenter;
+import com.example.mealplannerapp.search.ingedients.presenter.IngredientPresenterImpl;
+import com.example.mealplannerapp.search.ingedients.view.IngredientsRecyclerViewAdapter;
+import com.example.mealplannerapp.search.ingedients.view.IngredientsView;
+import com.example.mealplannerapp.search.ingedients.view.OnIngredientClickListener;
+
+import java.util.List;
+
+public class SearchFragment extends Fragment implements IngredientsView, OnIngredientClickListener, CountriesView , CategoriesView {
     private RecyclerView ingredientsRecyclerView, countriesRecyclerView, categoriesRecyclerView;
     private IngredientsRecyclerViewAdapter ingredientsAdapter;
     private CountriesRecyclerViewAdapter countriesAdapter;
     private CategoriesRecyclerViewAdapter categoriesAdapter;
+    private IngredientPresenter ingredientPresenter;
+    private CountriesPresenter countriesPresenter;
+    private CategoriesPresenter categoriesPresenter;
 
     public SearchFragment() {}
 
@@ -51,79 +58,46 @@ public class SearchFragment extends Fragment {
         categoriesRecyclerView = view.findViewById(R.id.categoriesRecyclerView);
         categoriesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
-        fetchIngredients();
-        fetchCountries();
-        fetchCategories();
+        Repository repository = Repository.getInstance(RemoteDataSource.getInstance());
+
+        ingredientPresenter = new IngredientPresenterImpl(this,repository);
+        countriesPresenter = new CountriesPresenterImpl(this,repository);
+        categoriesPresenter = new CategoriesPresenterImpl(this,repository);
+
+        // Fetch data
+        ingredientPresenter.getIngredients();
+        countriesPresenter.getCountries();
+        categoriesPresenter.getCategories();
 
         return view;
     }
 
-    private void fetchIngredients() {
-        IngredientService ingredientService = ApiClient.getClient().create(IngredientService.class);
-        Call<IngredientResponse> call = ingredientService.getIngredients();
-
-        call.enqueue(new Callback<IngredientResponse>() {
-            @Override
-            public void onResponse(Call<IngredientResponse> call, Response<IngredientResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<Ingredient> ingredientsList = response.body().getMeals();
-                    ingredientsAdapter = new IngredientsRecyclerViewAdapter(ingredientsList);
-                    ingredientsRecyclerView.setAdapter(ingredientsAdapter);
-                } else {
-                    Toast.makeText(getContext(), "Failed to get ingredients", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<IngredientResponse> call, Throwable t) {
-                Toast.makeText(getContext(), "API Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+    @Override
+    public void showData(List<Ingredient> ingredients) {
+        ingredientsAdapter = new IngredientsRecyclerViewAdapter(ingredients);
+        ingredientsRecyclerView.setAdapter(ingredientsAdapter);
     }
 
-    private void fetchCountries() {
-        CountryService countryService = ApiClient.getClient().create(CountryService.class);
-        Call<CountryRespsonse> call = countryService.getCountries();
-
-        call.enqueue(new Callback<CountryRespsonse>() {
-            @Override
-            public void onResponse(Call<CountryRespsonse> call, Response<CountryRespsonse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<Country> countriesList = response.body().getMeals();
-                    countriesAdapter = new CountriesRecyclerViewAdapter(countriesList);
-                    countriesRecyclerView.setAdapter(countriesAdapter);
-                } else {
-                    Toast.makeText(getContext(), "Failed to get countries", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<CountryRespsonse> call, Throwable t) {
-                Toast.makeText(getContext(), "API Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+    @Override
+    public void showCountries(List<Country> countries) {
+        countriesAdapter = new CountriesRecyclerViewAdapter(countries);
+        countriesRecyclerView.setAdapter(countriesAdapter);
     }
 
-    private void fetchCategories() {
-        CategoriesService categoriesService = ApiClient.getClient().create(CategoriesService.class);
-        Call<CategoriesResponse> call = categoriesService.getCategories();
-
-        call.enqueue(new Callback<CategoriesResponse>() {
-            @Override
-            public void onResponse(Call<CategoriesResponse> call, Response<CategoriesResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<Category> categoriesList = response.body().getCategories();
-                    categoriesAdapter = new CategoriesRecyclerViewAdapter(categoriesList);
-                    categoriesRecyclerView.setAdapter(categoriesAdapter);
-                } else {
-                    Toast.makeText(getContext(), "Failed to get categories", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<CategoriesResponse> call, Throwable t) {
-                Toast.makeText(getContext(), "API Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+    @Override
+    public void showCategories(List<Category> categories) {
+        categoriesAdapter = new CategoriesRecyclerViewAdapter(categories);
+        categoriesRecyclerView.setAdapter(categoriesAdapter);
     }
+
+    @Override
+    public void showErrMsg(String error) {
+        Toast.makeText(getContext(), "Error: " + error, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onIngredientClick(Ingredient ingredient) {
+        Toast.makeText(getContext(), "Clicked: " + ingredient.getStrIngredient(), Toast.LENGTH_SHORT).show();
+    }
+
 }
