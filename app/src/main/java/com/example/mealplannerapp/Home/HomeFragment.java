@@ -12,28 +12,29 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
-import com.example.mealplannerapp.Meal;
-import com.example.mealplannerapp.MealDetailsFragment;
 import com.example.mealplannerapp.R;
+import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
+import com.example.mealplannerapp.data.repo.Repository;
+import com.example.mealplannerapp.meal.MealDetailsFragment;
+import com.example.mealplannerapp.meal.models.Meal;
+import com.example.mealplannerapp.meal.presenter.MealPresenter;
+import com.example.mealplannerapp.meal.presenter.MealPresenterImpl;
+import com.example.mealplannerapp.meal.view.MealView;
 
 import java.util.List;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
-public class HomeFragment extends Fragment {
-    public static final String url = "https://www.themealdb.com/api/json/v1/1/";
+public class HomeFragment extends Fragment implements MealView {
     private static final String TAG = "HomeFragment";
-
-    public HomeFragment(){}
 
     private ImageView mealImage;
     private TextView mealTitle, mealId, usernameTextView;
     private CardView mealCard;
     private String mealIdValue;
+    private MealPresenter mealPresenter;
+
+    public HomeFragment() {}
 
     @Nullable
     @Override
@@ -52,7 +53,10 @@ public class HomeFragment extends Fragment {
         mealId = view.findViewById(R.id.mealId);
         mealCard = view.findViewById(R.id.mealCard);
 
-        fetchMeal();
+        Repository repository = Repository.getInstance(RemoteDataSource.getInstance());
+        mealPresenter = new MealPresenterImpl(this, repository);
+
+        mealPresenter.getMeals();
 
         mealCard.setOnClickListener(v -> {
             if (mealIdValue != null) {
@@ -73,44 +77,27 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
-    private void fetchMeal() {
-        Retrofit retrofitInstance = new Retrofit.Builder()
-                .baseUrl(url)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+    @Override
+    public void showMeal(List<Meal> meals) {
+        if (meals != null && !meals.isEmpty()) {
+            Meal meal = meals.get(0);
 
-        MealService mealService = retrofitInstance.create(MealService.class);
-        Call<MealResponse> call = mealService.getMeal();
+            mealIdValue = meal.getIdMeal();
 
-        call.enqueue(new Callback<MealResponse>() {
-            @Override
-            public void onResponse(Call<MealResponse> call, Response<MealResponse> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().getMeals() != null) {
-                    List<Meal> meals = response.body().getMeals();
-                    if (!meals.isEmpty()) {
-                        Meal meal = meals.get(0);
+            mealTitle.setText(meal.getStrMeal());
+            mealId.setText("Meal ID: " + mealIdValue);
 
-                        mealIdValue = meal.getIdMeal();
+            Glide.with(requireContext())
+                    .load(meal.getStrMealThumb())
+                    .into(mealImage);
+        } else {
+            showErrMsg("No meal found");
+        }
+    }
 
-                        mealTitle.setText(meal.getStrMeal());
-                        mealId.setText("Meal ID: " + mealIdValue);
-
-                        Glide.with(requireContext())
-                                .load(meal.getStrMealThumb())
-                                .into(mealImage);
-                    } else {
-                        Toast.makeText(getActivity(), "No meal found", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(getActivity(), "No meal found", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<MealResponse> call, Throwable throwable) {
-                Log.e(TAG, "API Error", throwable);
-                Toast.makeText(getActivity(), "Failed to fetch data", Toast.LENGTH_SHORT).show();
-            }
-        });
+    @Override
+    public void showErrMsg(String error) {
+        Log.e(TAG, "Error: " + error);
+        Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
     }
 }
