@@ -42,4 +42,9 @@ public class Repository {
         remoteDataSource.makeMealNetworkCall(mealCallback);
     }
 
+    public void getMealById(String mealId, MealCallback callback) {
+        remoteDataSource.makeMealDetailsNetworkCall(mealId, callback);
+    }
+
+
 }

@@ -64,7 +64,6 @@ public class SearchFragment extends Fragment implements IngredientsView, OnIngre
         countriesPresenter = new CountriesPresenterImpl(this,repository);
         categoriesPresenter = new CategoriesPresenterImpl(this,repository);
 
-        // Fetch data
         ingredientPresenter.getIngredients();
         countriesPresenter.getCountries();
         categoriesPresenter.getCategories();

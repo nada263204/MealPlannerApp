@@ -2,6 +2,7 @@ package com.example.mealplannerapp.data.remoteDataSource;
 
 import android.util.Log;
 
+import com.example.mealplannerapp.meal.models.MealByIDService;
 import com.example.mealplannerapp.meal.models.MealCallback;
 import com.example.mealplannerapp.meal.models.MealResponse;
 import com.example.mealplannerapp.meal.models.MealService;
@@ -24,6 +25,7 @@ public class RemoteDataSource {
     private CountryService countryService;
     private CategoriesService categoriesService;
     private MealService mealService;
+    private MealByIDService mealByIDService;
     private static RemoteDataSource instance;
 
     private static final String TAG = "RemoteDataSource";
@@ -33,6 +35,7 @@ public class RemoteDataSource {
         countryService = ApiClient.getClient().create(CountryService.class);
         categoriesService =ApiClient.getClient().create(CategoriesService.class);
         mealService =ApiClient.getClient().create(MealService.class);
+        mealByIDService =ApiClient.getClient().create(MealByIDService.class);
 
     }
 
@@ -113,6 +116,26 @@ public class RemoteDataSource {
 
         });
     }
+
+    public void makeMealDetailsNetworkCall(String mealId, MealCallback mealCallback) {
+        mealByIDService.getMealById(mealId).enqueue(new Callback<MealResponse>() {
+            @Override
+            public void onResponse(Call<MealResponse> call, Response<MealResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.d(TAG, "onResponse: " + response.body().getMeals());
+                    mealCallback.onSuccessResult(response.body().getMeals());
+                } else {
+                    mealCallback.onFailureResult("Failed to fetch meal details");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MealResponse> call, Throwable throwable) {
+                mealCallback.onFailureResult(throwable.getMessage());
+            }
+        });
+    }
+
 
 
 

@@ -1,6 +1,5 @@
 package com.example.mealplannerapp.meal.models;
 
-import com.example.mealplannerapp.search.countries.models.Country;
 
 import java.util.List;
 

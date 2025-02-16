@@ -53,7 +53,6 @@ public class HomeFragment extends Fragment implements MealView {
         mealId = view.findViewById(R.id.mealId);
         mealCard = view.findViewById(R.id.mealCard);
 
-        // Initialize MVP components
         Repository repository = Repository.getInstance(RemoteDataSource.getInstance());
         mealPresenter = new MealPresenterImpl(this, repository);
 
