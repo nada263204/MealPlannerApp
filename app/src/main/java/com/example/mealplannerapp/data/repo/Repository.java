@@ -1,10 +1,16 @@
 package com.example.mealplannerapp.data.repo;
 
+import com.example.mealplannerapp.meal.models.Meal;
 import com.example.mealplannerapp.meal.models.MealCallback;
 import com.example.mealplannerapp.search.categories.models.CategoriesCallback;
 import com.example.mealplannerapp.search.countries.models.CountriesCallBack;
 import com.example.mealplannerapp.search.ingedients.models.IngredientCallback;
 import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
+import com.example.mealplannerapp.search.ingedients.models.MealByIngredientCallback;
+
+import java.util.List;
+
+import retrofit2.Callback;
 
 public class Repository {
     private RemoteDataSource remoteDataSource;
@@ -45,6 +51,11 @@ public class Repository {
     public void getMealById(String mealId, MealCallback callback) {
         remoteDataSource.makeMealDetailsNetworkCall(mealId, callback);
     }
+
+    public void getMealsByIngredient(String ingredient, MealByIngredientCallback callback) {
+        remoteDataSource.makeMealByIngredientNetworkCall(ingredient, callback);
+    }
+
 
 
 }
