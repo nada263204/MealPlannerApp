@@ -9,7 +9,6 @@ import com.example.mealplannerapp.search.ingedients.view.IngredientsView;
 import java.util.List;
 
 public class CountriesPresenterImpl implements CountriesPresenter, CountriesCallBack {
-
     private CountriesView _view;
     private Repository _repo;
 

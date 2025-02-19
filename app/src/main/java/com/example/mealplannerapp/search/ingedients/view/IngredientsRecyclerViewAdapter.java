@@ -5,25 +5,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-
-import java.util.List;
-
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.mealplannerapp.R;
 import com.example.mealplannerapp.search.ingedients.models.Ingredient;
-
+import java.util.List;
 
 public class IngredientsRecyclerViewAdapter extends RecyclerView.Adapter<IngredientsRecyclerViewAdapter.IngredientViewHolder> {
     private List<Ingredient> ingredientsList;
+    private OnIngredientClickListener clickListener;
 
-    public IngredientsRecyclerViewAdapter(List<Ingredient> ingredientsList) {
+    public IngredientsRecyclerViewAdapter(List<Ingredient> ingredientsList, OnIngredientClickListener clickListener) {
         this.ingredientsList = ingredientsList;
+        this.clickListener = clickListener;
     }
 
     @NonNull
@@ -36,14 +32,7 @@ public class IngredientsRecyclerViewAdapter extends RecyclerView.Adapter<Ingredi
     @Override
     public void onBindViewHolder(@NonNull IngredientViewHolder holder, int position) {
         Ingredient ingredient = ingredientsList.get(position);
-
-        holder.tvIngredientName.setText(ingredient.getStrIngredient());
-
-        Glide.with(holder.itemView.getContext())
-                .load(ingredient.getImageUrl())
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .placeholder(R.drawable.background)
-                .into(holder.ivIngredientImage);
+        holder.bind(ingredient, clickListener);
     }
 
     @Override
@@ -60,19 +49,21 @@ public class IngredientsRecyclerViewAdapter extends RecyclerView.Adapter<Ingredi
             tvIngredientName = itemView.findViewById(R.id.categoryName);
             ivIngredientImage = itemView.findViewById(R.id.categoryImage);
         }
-    }
-}
 
+        public void bind(Ingredient ingredient, OnIngredientClickListener clickListener) {
+            tvIngredientName.setText(ingredient.getStrIngredient());
 
+            Glide.with(itemView.getContext())
+                    .load(ingredient.getImageUrl())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.background)
+                    .into(ivIngredientImage);
 
-class IngredientRecyclerViewHolder extends RecyclerView.ViewHolder {
-    TextView tvTitle, tvIngredients;
-    ImageView imageView;
-
-    public IngredientRecyclerViewHolder(View itemView) {
-        super(itemView);
-        tvTitle = itemView.findViewById(R.id.tv_title);
-        tvIngredients = itemView.findViewById(R.id.tv_ingredients);
-        imageView = itemView.findViewById(R.id.iv_meal);
+            itemView.setOnClickListener(v -> {
+                if (clickListener != null) {
+                    clickListener.onIngredientClick(ingredient);
+                }
+            });
+        }
     }
 }
