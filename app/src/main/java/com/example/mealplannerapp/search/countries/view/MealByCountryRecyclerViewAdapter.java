@@ -1,4 +1,4 @@
-package com.example.mealplannerapp.search.ingedients.view;
+package com.example.mealplannerapp.search.countries.view;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,11 +13,11 @@ import com.example.mealplannerapp.meal.models.OnMealClickListener;
 import com.example.mealplannerapp.meal.models.MealBy;
 import java.util.List;
 
-public class MealsByIngredientAdapter extends RecyclerView.Adapter<MealViewHolder> {
+public class MealByCountryRecyclerViewAdapter extends RecyclerView.Adapter<MealViewHolder> {
     private List<MealBy> mealsList;
     private OnMealClickListener listener;
 
-    public MealsByIngredientAdapter(List<MealBy> mealsList, OnMealClickListener listener) {
+    public MealByCountryRecyclerViewAdapter(List<MealBy> mealsList, OnMealClickListener listener) {
         this.mealsList = mealsList;
         this.listener = listener;
     }
@@ -67,3 +67,4 @@ class MealViewHolder extends RecyclerView.ViewHolder {
         mealImage = itemView.findViewById(R.id.iv_meal);
     }
 }
+

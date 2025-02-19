@@ -1,27 +1,30 @@
-package com.example.mealplannerapp.search.ingedients.view;
+package com.example.mealplannerapp.search.categories.view;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.example.mealplannerapp.R;
-import com.example.mealplannerapp.meal.models.OnMealClickListener;
 import com.example.mealplannerapp.meal.models.MealBy;
+import com.example.mealplannerapp.meal.models.OnMealClickListener;
+
 import java.util.List;
 
-public class MealsByIngredientAdapter extends RecyclerView.Adapter<MealViewHolder> {
+public class MealsByCategoryAdapter extends RecyclerView.Adapter<MealViewHolder> {
+
+
     private List<MealBy> mealsList;
     private OnMealClickListener listener;
-
-    public MealsByIngredientAdapter(List<MealBy> mealsList, OnMealClickListener listener) {
+    public MealsByCategoryAdapter(List<MealBy> mealsList, OnMealClickListener listener) {
         this.mealsList = mealsList;
         this.listener = listener;
     }
-
     @NonNull
     @Override
     public MealViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -49,13 +52,13 @@ public class MealsByIngredientAdapter extends RecyclerView.Adapter<MealViewHolde
     public int getItemCount() {
         return mealsList.size();
     }
-
     public void updateMeals(List<MealBy> newMeals) {
         this.mealsList.clear();
         this.mealsList.addAll(newMeals);
         notifyItemRangeChanged(0, newMeals.size());
     }
 }
+
 
 class MealViewHolder extends RecyclerView.ViewHolder {
     TextView mealName;

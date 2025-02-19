@@ -1,24 +1,23 @@
-package com.example.mealplannerapp.search.ingedients.presenter;
+package com.example.mealplannerapp.search.countries.presenter;
 
 import com.example.mealplannerapp.data.repo.Repository;
+import com.example.mealplannerapp.search.countries.view.MealByCountryView;
 import com.example.mealplannerapp.meal.models.MealBy;
 import com.example.mealplannerapp.meal.models.MealByCallback;
-import com.example.mealplannerapp.search.ingedients.view.MealsByIngredientView;
 
 import java.util.List;
 
-public class MealsByIngredientPresenterImpl implements MealByIngredientPresenter {
-    private MealsByIngredientView _view;
+public class MealsByCountryPresenterImpl implements MealsByCountryPresenter{
+    private MealByCountryView _view;
     private Repository _repo;
 
-    public MealsByIngredientPresenterImpl(MealsByIngredientView view, Repository repository) {
+    public MealsByCountryPresenterImpl(MealByCountryView view, Repository repository) {
         this._view = view;
         this._repo = repository;
     }
-
     @Override
-    public void getMealsByIngredient(String ingredient) {
-        _repo.getMealsByIngredient(ingredient, new MealByCallback() {
+    public void getMealsByCountry(String country) {
+        _repo.getMealsByCountry(country, new MealByCallback() {
 
             @Override
             public void onSuccessResult(List<MealBy> meals) {
@@ -32,4 +31,3 @@ public class MealsByIngredientPresenterImpl implements MealByIngredientPresenter
         });
     }
 }
-

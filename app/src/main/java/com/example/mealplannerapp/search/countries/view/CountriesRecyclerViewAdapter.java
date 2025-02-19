@@ -10,8 +10,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.mealplannerapp.R;
 import com.example.mealplannerapp.search.countries.models.Country;
+import com.example.mealplannerapp.search.ingedients.models.Ingredient;
+import com.example.mealplannerapp.search.ingedients.view.OnIngredientClickListener;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,9 +23,11 @@ import java.util.Map;
 public class CountriesRecyclerViewAdapter extends RecyclerView.Adapter<CountriesRecyclerViewAdapter.CountryViewHolder> {
     private List<Country> countriesList;
     private final Map<String, Integer> countryThumbnails;
+    private OnCountryClickListener listener;
 
-    public CountriesRecyclerViewAdapter(List<Country> countriesList) {
+    public CountriesRecyclerViewAdapter(List<Country> countriesList,OnCountryClickListener listener) {
         this.countriesList = countriesList;
+        this.listener =listener;
         countryThumbnails = initializeThumbnails();
     }
 
@@ -61,8 +66,10 @@ public class CountriesRecyclerViewAdapter extends RecyclerView.Adapter<Countries
     }
 
     public void updateData(List<Country> newCountriesList) {
-        this.countriesList = newCountriesList;
-        notifyDataSetChanged();
+        if (newCountriesList != null) {
+            this.countriesList = newCountriesList;
+            notifyDataSetChanged();
+        }
     }
 
     @NonNull
@@ -76,10 +83,15 @@ public class CountriesRecyclerViewAdapter extends RecyclerView.Adapter<Countries
     public void onBindViewHolder(@NonNull CountryViewHolder holder, int position) {
         Country country = countriesList.get(position);
         holder.tvCountryName.setText(country.getStrArea());
+        holder.bind(country, listener);
 
         int thumbnailResId = countryThumbnails.getOrDefault(country.getStrArea(), R.drawable.background);
-
         holder.ivCountryFlag.setImageResource(thumbnailResId);
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onCountryClick(country);
+            }
+        });
     }
 
     @Override
@@ -95,6 +107,22 @@ public class CountriesRecyclerViewAdapter extends RecyclerView.Adapter<Countries
             super(itemView);
             tvCountryName = itemView.findViewById(R.id.categoryName);
             ivCountryFlag = itemView.findViewById(R.id.categoryImage);
+        }
+
+        public void bind(Country country, OnCountryClickListener clickListener) {
+            tvCountryName.setText(country.getStrArea());
+
+            Glide.with(itemView.getContext())
+                    .load(country.getFlagUrl())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.background)
+                    .into(ivCountryFlag);
+
+            itemView.setOnClickListener(v -> {
+                if (clickListener != null) {
+                    clickListener.onCountryClick(country);
+                }
+            });
         }
     }
 }

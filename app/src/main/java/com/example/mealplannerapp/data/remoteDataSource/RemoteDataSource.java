@@ -8,14 +8,16 @@ import com.example.mealplannerapp.meal.models.MealService;
 import com.example.mealplannerapp.search.categories.models.CategoriesCallback;
 import com.example.mealplannerapp.search.categories.models.CategoriesResponse;
 import com.example.mealplannerapp.search.categories.models.CategoriesService;
+import com.example.mealplannerapp.search.categories.models.MealByCategoryService;
 import com.example.mealplannerapp.search.countries.models.CountriesCallBack;
 import com.example.mealplannerapp.search.countries.models.CountryResponse;
 import com.example.mealplannerapp.search.countries.models.CountryService;
+import com.example.mealplannerapp.search.countries.models.MealByCountryService;
 import com.example.mealplannerapp.search.ingedients.models.IngredientCallback;
 import com.example.mealplannerapp.search.ingedients.models.IngredientResponse;
 import com.example.mealplannerapp.search.ingedients.models.IngredientService;
-import com.example.mealplannerapp.search.ingedients.models.MealByIngredientCallback;
-import com.example.mealplannerapp.search.ingedients.models.MealByIngredientResponse;
+import com.example.mealplannerapp.meal.models.MealByCallback;
+import com.example.mealplannerapp.meal.models.MealByResponse;
 import com.example.mealplannerapp.search.ingedients.models.MealByIngredientService;
 
 import retrofit2.Call;
@@ -29,6 +31,8 @@ public class RemoteDataSource {
     private MealService mealService;
     private MealByIDService mealByIDService;
     private MealByIngredientService mealByIngredientService;
+    private MealByCountryService mealByCountryService;
+    private MealByCategoryService mealByCategoryService;
     private static RemoteDataSource instance;
     private static final String TAG = "RemoteDataSource";
 
@@ -38,7 +42,9 @@ public class RemoteDataSource {
         categoriesService = ApiClient.getClient().create(CategoriesService.class);
         mealService = ApiClient.getClient().create(MealService.class);
         mealByIDService = ApiClient.getClient().create(MealByIDService.class);
-        mealByIngredientService = ApiClient.getClient().create(MealByIngredientService.class); // ✅ Fixed missing initialization
+        mealByIngredientService = ApiClient.getClient().create(MealByIngredientService.class);
+        mealByCountryService =ApiClient.getClient().create(MealByCountryService.class);
+        mealByCategoryService=ApiClient.getClient().create(MealByCategoryService.class);
     }
 
     public void makeIngredientsNetworkCall(IngredientCallback ingredientCallback) {
@@ -115,10 +121,10 @@ public class RemoteDataSource {
         });
     }
 
-    public void makeMealByIngredientNetworkCall(String ingredient, MealByIngredientCallback mealByIngredientCallback) {
-        mealByIngredientService.getMealsByIngredient(ingredient).enqueue(new Callback<MealByIngredientResponse>() {
+    public void makeMealByIngredientNetworkCall(String ingredient, MealByCallback mealByIngredientCallback) {
+        mealByIngredientService.getMealsByIngredient(ingredient).enqueue(new Callback<MealByResponse>() {
             @Override
-            public void onResponse(Call<MealByIngredientResponse> call, Response<MealByIngredientResponse> response) {
+            public void onResponse(Call<MealByResponse> call, Response<MealByResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Log.d(TAG, "onResponse: " + response.body().getMeals());
                     mealByIngredientCallback.onSuccessResult(response.body().getMeals());
@@ -128,8 +134,46 @@ public class RemoteDataSource {
             }
 
             @Override
-            public void onFailure(Call<MealByIngredientResponse> call, Throwable throwable) {
+            public void onFailure(Call<MealByResponse> call, Throwable throwable) {
                 mealByIngredientCallback.onFailureResult(throwable.getMessage());
+            }
+        });
+    }
+
+    public void makeMealByCountryNetworkCall(String country, MealByCallback mealByCountryCallback) {
+        mealByCountryService.getMealsByCountry(country).enqueue(new Callback<MealByResponse>() {
+            @Override
+            public void onResponse(Call<MealByResponse> call, Response<MealByResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.d(TAG, "onResponse: " + response.body().getMeals());
+                    mealByCountryCallback.onSuccessResult(response.body().getMeals());
+                } else {
+                    mealByCountryCallback.onFailureResult("Failed to fetch meals by ingredient");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MealByResponse> call, Throwable throwable) {
+                mealByCountryCallback.onFailureResult(throwable.getMessage());
+            }
+        });
+    }
+
+    public void makeMealByCategoryNetworkCall(String category, MealByCallback mealByCategoryCallback) {
+        mealByCategoryService.getMealsByCategory(category).enqueue(new Callback<MealByResponse>() {
+            @Override
+            public void onResponse(Call<MealByResponse> call, Response<MealByResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.d(TAG, "onResponse: " + response.body().getMeals());
+                    mealByCategoryCallback.onSuccessResult(response.body().getMeals());
+                } else {
+                    mealByCategoryCallback.onFailureResult("Failed to fetch meals by country");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MealByResponse> call, Throwable throwable) {
+                mealByCategoryCallback.onFailureResult(throwable.getMessage());
             }
         });
     }

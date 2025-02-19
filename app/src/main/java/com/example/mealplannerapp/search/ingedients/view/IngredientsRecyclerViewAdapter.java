@@ -11,7 +11,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.mealplannerapp.R;
 import com.example.mealplannerapp.search.ingedients.models.Ingredient;
-import com.example.mealplannerapp.search.ingedients.view.OnIngredientClickListener;
 import java.util.List;
 
 public class IngredientsRecyclerViewAdapter extends RecyclerView.Adapter<IngredientsRecyclerViewAdapter.IngredientViewHolder> {

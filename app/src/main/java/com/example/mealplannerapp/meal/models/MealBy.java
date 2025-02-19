@@ -1,8 +1,8 @@
-package com.example.mealplannerapp.search.ingedients.models;
+package com.example.mealplannerapp.meal.models;
 
 import com.google.gson.annotations.SerializedName;
 
-public class MealByIngredient {
+public class MealBy {
     @SerializedName("idMeal")
     private String id;
 

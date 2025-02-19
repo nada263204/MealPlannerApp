@@ -19,11 +19,15 @@ import com.example.mealplannerapp.search.categories.presenter.CategoriesPresente
 import com.example.mealplannerapp.search.categories.view.CategoriesRecyclerViewAdapter;
 import com.example.mealplannerapp.search.categories.models.Category;
 import com.example.mealplannerapp.search.categories.view.CategoriesView;
+import com.example.mealplannerapp.search.categories.view.MealsByCategoryFragment;
+import com.example.mealplannerapp.search.categories.view.OnCategoryClickListener;
 import com.example.mealplannerapp.search.countries.presenter.CountriesPresenter;
 import com.example.mealplannerapp.search.countries.presenter.CountriesPresenterImpl;
 import com.example.mealplannerapp.search.countries.view.CountriesRecyclerViewAdapter;
 import com.example.mealplannerapp.search.countries.models.Country;
 import com.example.mealplannerapp.search.countries.view.CountriesView;
+import com.example.mealplannerapp.search.countries.view.MealsByCountryFragment;
+import com.example.mealplannerapp.search.countries.view.OnCountryClickListener;
 import com.example.mealplannerapp.search.ingedients.models.Ingredient;
 import com.example.mealplannerapp.search.ingedients.presenter.IngredientPresenter;
 import com.example.mealplannerapp.search.ingedients.presenter.IngredientPresenterImpl;
@@ -34,7 +38,7 @@ import com.example.mealplannerapp.search.ingedients.view.OnIngredientClickListen
 
 import java.util.List;
 
-public class SearchFragment extends Fragment implements IngredientsView, OnIngredientClickListener, CountriesView, CategoriesView {
+public class SearchFragment extends Fragment implements  OnIngredientClickListener, OnCategoryClickListener, OnCountryClickListener,IngredientsView, CountriesView, CategoriesView {
     private RecyclerView ingredientsRecyclerView, countriesRecyclerView, categoriesRecyclerView;
     private IngredientsRecyclerViewAdapter ingredientsAdapter;
     private CountriesRecyclerViewAdapter countriesAdapter;
@@ -62,7 +66,6 @@ public class SearchFragment extends Fragment implements IngredientsView, OnIngre
         categoriesRecyclerView = view.findViewById(R.id.categoriesRecyclerView);
         btnExpandCategories = view.findViewById(R.id.btnExpandCategories);
 
-        // Set default layouts
         ingredientsRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3, GridLayoutManager.HORIZONTAL, false));
         countriesRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1, GridLayoutManager.HORIZONTAL, false));
         categoriesRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1, GridLayoutManager.HORIZONTAL, false));
@@ -165,20 +168,11 @@ public class SearchFragment extends Fragment implements IngredientsView, OnIngre
         }
     }
 
-    @Override
-    public void showCountries(List<Country> countries) {
-        if (countries != null && !countries.isEmpty()) {
-            countriesAdapter = new CountriesRecyclerViewAdapter(countries);
-            countriesRecyclerView.setAdapter(countriesAdapter);
-        } else {
-            showErrMsg("No countries available");
-        }
-    }
 
     @Override
     public void showCategories(List<Category> categories) {
         if (categories != null && !categories.isEmpty()) {
-            categoriesAdapter = new CategoriesRecyclerViewAdapter(categories);
+            categoriesAdapter = new CategoriesRecyclerViewAdapter(categories,this::onCategoryClick);
             categoriesRecyclerView.setAdapter(categoriesAdapter);
         } else {
             showErrMsg("No categories available");
@@ -201,6 +195,63 @@ public class SearchFragment extends Fragment implements IngredientsView, OnIngre
         bundle.putString("ingredient_name", ingredient.getStrIngredient());
 
         MealsByIngredientFragment fragment = new MealsByIngredientFragment();
+        fragment.setArguments(bundle);
+
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    @Override
+    public void showCountries(List<Country> countries) {
+        if (countries != null && !countries.isEmpty()) {
+            countriesAdapter = new CountriesRecyclerViewAdapter(countries,this);
+            countriesRecyclerView.setAdapter(countriesAdapter);
+        } else {
+            showErrMsg("No countries available");
+        }
+    }
+
+    @Override
+    public void onCountryClick(Country country) {
+        if (country == null || country.getStrArea() == null) {
+            Toast.makeText(getContext(), "Invalid country", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Toast.makeText(getContext(), "Fetching meals for: " + country.getStrArea(), Toast.LENGTH_SHORT).show();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("country_name", country.getStrArea());
+
+        MealsByCountryFragment fragment = new MealsByCountryFragment();
+        fragment.setArguments(bundle);
+
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+
+
+
+    @Override
+    public void onCategoryClick(Category category) {
+        if (category == null || category.getStrCategory() == null) {
+            Toast.makeText(getContext(), "Invalid country", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Toast.makeText(getContext(), "Fetching meals for: " + category.getStrCategory(), Toast.LENGTH_SHORT).show();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("category_name", category.getStrCategory());
+
+        MealsByCategoryFragment fragment = new MealsByCategoryFragment();
         fragment.setArguments(bundle);
 
         requireActivity().getSupportFragmentManager()

@@ -11,14 +11,18 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.mealplannerapp.R;
 import com.example.mealplannerapp.search.categories.models.Category;
+import com.example.mealplannerapp.search.ingedients.models.Ingredient;
+import com.example.mealplannerapp.search.ingedients.view.OnIngredientClickListener;
 
 import java.util.List;
 
 public class CategoriesRecyclerViewAdapter extends RecyclerView.Adapter<CategoriesRecyclerViewAdapter.CategoryViewHolder> {
     private List<Category> categoriesList;
+    private OnCategoryClickListener listener;
 
-    public CategoriesRecyclerViewAdapter(List<Category> categoriesList) {
+    public CategoriesRecyclerViewAdapter(List<Category> categoriesList,OnCategoryClickListener listener) {
         this.categoriesList = categoriesList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -33,6 +37,7 @@ public class CategoriesRecyclerViewAdapter extends RecyclerView.Adapter<Categori
         Category category = categoriesList.get(position);
 
         holder.tvCategoryName.setText(category.getStrCategory());
+        holder.bind(category, listener);
 
         Glide.with(holder.itemView.getContext())
                 .load(category.getStrCategoryThumb())
@@ -54,6 +59,22 @@ public class CategoriesRecyclerViewAdapter extends RecyclerView.Adapter<Categori
             super(itemView);
             tvCategoryName = itemView.findViewById(R.id.categoryName);
             ivCategoryImage = itemView.findViewById(R.id.categoryImage);
+        }
+
+        public void bind(Category category, OnCategoryClickListener clickListener) {
+            tvCategoryName.setText(category.getStrCategory());
+
+            Glide.with(itemView.getContext())
+                    .load(category.getStrCategoryThumb())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.background)
+                    .into(ivCategoryImage);
+
+            itemView.setOnClickListener(v -> {
+                if (clickListener != null) {
+                    clickListener.onCategoryClick(category);
+                }
+            });
         }
     }
 }
