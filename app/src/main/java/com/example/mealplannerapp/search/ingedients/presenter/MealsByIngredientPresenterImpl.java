@@ -7,6 +7,9 @@ import com.example.mealplannerapp.search.ingedients.view.MealsByIngredientView;
 
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 public class MealsByIngredientPresenterImpl implements MealByIngredientPresenter {
     private MealsByIngredientView _view;
     private Repository _repo;
@@ -18,18 +21,13 @@ public class MealsByIngredientPresenterImpl implements MealByIngredientPresenter
 
     @Override
     public void getMealsByIngredient(String ingredient) {
-        _repo.getMealsByIngredient(ingredient, new MealByCallback() {
-
-            @Override
-            public void onSuccessResult(List<MealBy> meals) {
-                _view.showMeals(meals);
-            }
-
-            @Override
-            public void onFailureResult(String errorMsg) {
-                _view.showError(errorMsg);
-            }
-        });
+        _repo.getMealsByIngredient(ingredient)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        meal -> _view.showMeals(meal),
+                        error -> _view.showError(error.getMessage())
+                );
     }
 }
 

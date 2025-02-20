@@ -1,7 +1,6 @@
 package com.example.mealplannerapp.meal;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,19 +19,11 @@ import com.example.mealplannerapp.R;
 import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
 import com.example.mealplannerapp.data.repo.Repository;
 import com.example.mealplannerapp.meal.models.Meal;
-import com.example.mealplannerapp.meal.models.MealByIDService;
-import com.example.mealplannerapp.meal.models.MealResponse;
 import com.example.mealplannerapp.meal.presenter.MealDetailsPresenter;
 import com.example.mealplannerapp.meal.presenter.MealDetailsPresenterImpl;
 import com.example.mealplannerapp.meal.view.MealView;
 
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MealDetailsFragment extends Fragment implements MealView {
     private MealDetailsPresenter presenter;

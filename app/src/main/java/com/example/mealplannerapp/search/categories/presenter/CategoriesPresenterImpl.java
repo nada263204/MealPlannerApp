@@ -8,6 +8,9 @@ import com.example.mealplannerapp.search.ingedients.view.IngredientsView;
 
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 public class CategoriesPresenterImpl implements CategoriesPresenter, CategoriesCallback {
     private CategoriesView _view;
     private Repository _repo;
@@ -28,6 +31,12 @@ public class CategoriesPresenterImpl implements CategoriesPresenter, CategoriesC
 
     @Override
     public void getCategories() {
-        _repo.getAllCategories(this);
+        _repo.getAllCategories()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        category -> _view.showCategories(category),
+                        error -> _view.showErrMsg(error.getMessage())
+                );
     }
 }

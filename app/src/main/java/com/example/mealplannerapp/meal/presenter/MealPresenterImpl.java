@@ -7,6 +7,9 @@ import com.example.mealplannerapp.meal.view.MealView;
 
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 public class MealPresenterImpl implements MealPresenter, MealCallback {
     private MealView _view;
     private Repository _repo;
@@ -28,6 +31,12 @@ public class MealPresenterImpl implements MealPresenter, MealCallback {
 
     @Override
     public void getMeals() {
-        _repo.getRandomMeal(this);
+        _repo.getRandomMeal()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        meals -> _view.showMeal(meals),
+                        error -> _view.showErrMsg(error.getMessage())
+                );
     }
 }

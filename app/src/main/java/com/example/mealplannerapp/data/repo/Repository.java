@@ -1,11 +1,26 @@
 package com.example.mealplannerapp.data.repo;
 
+import com.example.mealplannerapp.meal.models.Meal;
+import com.example.mealplannerapp.meal.models.MealBy;
+import com.example.mealplannerapp.meal.models.MealByResponse;
 import com.example.mealplannerapp.meal.models.MealCallback;
+import com.example.mealplannerapp.meal.models.MealResponse;
 import com.example.mealplannerapp.search.categories.models.CategoriesCallback;
+import com.example.mealplannerapp.search.categories.models.CategoriesResponse;
+import com.example.mealplannerapp.search.categories.models.Category;
 import com.example.mealplannerapp.search.countries.models.CountriesCallBack;
+import com.example.mealplannerapp.search.countries.models.Country;
+import com.example.mealplannerapp.search.countries.models.CountryResponse;
+import com.example.mealplannerapp.search.ingedients.models.Ingredient;
 import com.example.mealplannerapp.search.ingedients.models.IngredientCallback;
 import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
 import com.example.mealplannerapp.meal.models.MealByCallback;
+import com.example.mealplannerapp.search.ingedients.models.IngredientResponse;
+
+import java.util.List;
+
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
 
 public class Repository {
     private RemoteDataSource remoteDataSource;
@@ -25,36 +40,44 @@ public class Repository {
         //this.localDataSource = local;
     }
 
-    public void getAllIngredients(IngredientCallback ingredientCallback){
-        remoteDataSource.makeIngredientsNetworkCall(ingredientCallback);
+    public Observable<List<Ingredient>> getAllIngredients(){
+        return remoteDataSource.makeIngredientsNetworkCall()
+                .map(IngredientResponse::getIngredients);
     }
 
-    public void getAllCountries(CountriesCallBack countriesCallBack){
-        remoteDataSource.makeCountriesNetworkCall(countriesCallBack);
+    public Observable<List<Country>> getAllCountries(){
+        return remoteDataSource.makeCountriesNetworkCall()
+                .map(CountryResponse::getCountries);
     }
 
-    public void getAllCategories(CategoriesCallback categoriesCallback){
-        remoteDataSource.makeCategoriesNetworkCall(categoriesCallback);
+    public Observable<List<Category>> getAllCategories(){
+        return remoteDataSource.makeCategoriesNetworkCall()
+                .map(CategoriesResponse::getCategories);
     }
 
-    public void getRandomMeal(MealCallback mealCallback){
-        remoteDataSource.makeMealNetworkCall(mealCallback);
+    public Observable<List<Meal>> getRandomMeal(){
+        return remoteDataSource.makeMealNetworkCall()
+                .map(MealResponse::getMeals);
     }
 
-    public void getMealById(String mealId, MealCallback callback) {
-        remoteDataSource.makeMealDetailsNetworkCall(mealId, callback);
+    public Observable<List<Meal>> getMealById(String mealId) {
+        return remoteDataSource.makeMealDetailsNetworkCall(mealId)
+                .map(MealResponse::getMeals);
     }
 
-    public void getMealsByIngredient(String ingredient, MealByCallback callback) {
-        remoteDataSource.makeMealByIngredientNetworkCall(ingredient, callback);
+    public Observable<List<MealBy>> getMealsByIngredient(String ingredientId) {
+        return remoteDataSource.makeMealByIngredientNetworkCall(ingredientId)
+                .map(MealByResponse::getMeals);
     }
 
-    public void getMealsByCountry(String country, MealByCallback callback) {
-        remoteDataSource.makeMealByCountryNetworkCall(country, callback);
+    public Observable<List<MealBy>> getMealsByCountry(String country) {
+        return remoteDataSource.makeMealByCountryNetworkCall(country)
+                .map(MealByResponse::getMeals);
     }
 
-    public void getMealsByCategory(String category, MealByCallback callback) {
-        remoteDataSource.makeMealByCategoryNetworkCall(category, callback);
+    public Observable<List<MealBy>> getMealsByCategory(String category) {
+        return remoteDataSource.makeMealByCategoryNetworkCall(category)
+                .map(MealByResponse::getMeals);
     }
 
 

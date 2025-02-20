@@ -7,6 +7,9 @@ import com.example.mealplannerapp.meal.view.MealView;
 
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 public class MealDetailsPresenterImpl implements MealDetailsPresenter, MealCallback {
     private MealView _view;
     private Repository _repo;
@@ -18,7 +21,14 @@ public class MealDetailsPresenterImpl implements MealDetailsPresenter, MealCallb
 
     @Override
     public void getMealById(String mealId) {
-        _repo.getMealById(mealId, this);
+
+        _repo.getMealById(mealId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        meal -> _view.showMeal(meal),
+                        error -> _view.showErrMsg(error.getMessage())
+                );
     }
 
     @Override
