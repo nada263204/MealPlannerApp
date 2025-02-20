@@ -7,6 +7,9 @@ import com.example.mealplannerapp.meal.models.MealByCallback;
 
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 public class MealsByCountryPresenterImpl implements MealsByCountryPresenter{
     private MealByCountryView _view;
     private Repository _repo;
@@ -17,17 +20,12 @@ public class MealsByCountryPresenterImpl implements MealsByCountryPresenter{
     }
     @Override
     public void getMealsByCountry(String country) {
-        _repo.getMealsByCountry(country, new MealByCallback() {
-
-            @Override
-            public void onSuccessResult(List<MealBy> meals) {
-                _view.showMeals(meals);
-            }
-
-            @Override
-            public void onFailureResult(String errorMsg) {
-                _view.showError(errorMsg);
-            }
-        });
+        _repo.getMealsByCountry(country)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        meal -> _view.showMeals(meal),
+                        error -> _view.showError(error.getMessage())
+                );
     }
 }

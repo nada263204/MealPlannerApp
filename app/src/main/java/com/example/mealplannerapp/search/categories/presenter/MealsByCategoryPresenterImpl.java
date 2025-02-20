@@ -7,6 +7,9 @@ import com.example.mealplannerapp.search.categories.view.MealsByCategoryView;
 
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 public class MealsByCategoryPresenterImpl implements MealsByCategoryPresenter{
 
     private MealsByCategoryView _view;
@@ -20,16 +23,12 @@ public class MealsByCategoryPresenterImpl implements MealsByCategoryPresenter{
 
     @Override
     public void getMealsByCategory(String category) {
-        _repo.getMealsByCategory(category, new MealByCallback() {
-            @Override
-            public void onSuccessResult(List<MealBy> meals) {
-                _view.showMeals(meals);
-            }
-
-            @Override
-            public void onFailureResult(String errorMsg) {
-                _view.showError(errorMsg);
-            }
-        });
+        _repo.getMealsByCategory(category)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        meal -> _view.showMeals(meal),
+                        error -> _view.showError(error.getMessage())
+                );
     }
 }

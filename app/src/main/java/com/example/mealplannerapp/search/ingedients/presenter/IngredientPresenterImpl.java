@@ -7,7 +7,10 @@ import com.example.mealplannerapp.search.ingedients.view.IngredientsView;
 
 import java.util.List;
 
-public class IngredientPresenterImpl implements IngredientPresenter , IngredientCallback {
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
+public class IngredientPresenterImpl implements IngredientPresenter {
     private IngredientsView _view;
     private Repository _repo;
 
@@ -16,18 +19,16 @@ public class IngredientPresenterImpl implements IngredientPresenter , Ingredient
         this._repo=repo;
     }
 
-    @Override
-    public void onSuccessResult(List<Ingredient> ingredients) {
-        _view.showData(ingredients);
-    }
 
     @Override
-    public void onFailureResult(String errorMsg) {
-        _view.showErrMsg(errorMsg);
-    }
-
-    @Override
-    public void getIngredients() {
-        _repo.getAllIngredients(this);
+    public void getIngredients()
+    {
+        _repo.getAllIngredients()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        ingredient -> _view.showData(ingredient),
+                        error -> _view.showErrMsg(error.getMessage())
+                );
     }
 }

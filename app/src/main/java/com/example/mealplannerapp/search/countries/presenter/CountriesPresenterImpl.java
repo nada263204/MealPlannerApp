@@ -8,6 +8,9 @@ import com.example.mealplannerapp.search.ingedients.view.IngredientsView;
 
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 public class CountriesPresenterImpl implements CountriesPresenter, CountriesCallBack {
     private CountriesView _view;
     private Repository _repo;
@@ -28,6 +31,12 @@ public class CountriesPresenterImpl implements CountriesPresenter, CountriesCall
 
     @Override
     public void getCountries() {
-        _repo.getAllCountries(this);
+        _repo.getAllCountries()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        country -> _view.showCountries(country),
+                        error -> _view.showErrMsg(error.getMessage())
+                );
     }
 }
