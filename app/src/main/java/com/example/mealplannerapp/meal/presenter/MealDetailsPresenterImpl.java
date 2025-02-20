@@ -32,6 +32,17 @@ public class MealDetailsPresenterImpl implements MealDetailsPresenter, MealCallb
     }
 
     @Override
+    public void addToFav(Meal meal) {
+        _repo.insertMealToFav(meal)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        () -> _view.showErrMsg("done"),
+                        error -> _view.showErrMsg(error.getMessage())
+                );
+    }
+
+    @Override
     public void onSuccessResult(List<Meal> meals) {
         _view.showMeal(meals);
     }
