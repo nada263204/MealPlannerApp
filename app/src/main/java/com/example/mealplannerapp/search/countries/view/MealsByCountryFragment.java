@@ -10,14 +10,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 import com.example.mealplannerapp.R;
+import com.example.mealplannerapp.data.localDataSource.LocalDataSource;
 import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
 import com.example.mealplannerapp.data.repo.Repository;
-import com.example.mealplannerapp.meal.MealDetailsFragment;
-import com.example.mealplannerapp.meal.models.OnMealClickListener;
+import com.example.mealplannerapp.meal.view.MealDetailsFragment;
+import com.example.mealplannerapp.meal.view.OnMealClickListener;
 import com.example.mealplannerapp.search.countries.presenter.MealsByCountryPresenter;
 import com.example.mealplannerapp.search.countries.presenter.MealsByCountryPresenterImpl;
 import com.example.mealplannerapp.meal.models.MealBy;
-import com.example.mealplannerapp.search.ingedients.presenter.MealsByIngredientPresenterImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ public class MealsByCountryFragment extends Fragment implements MealByCountryVie
             return;
         }
 
-        Repository repository = Repository.getInstance(RemoteDataSource.getInstance());
+        Repository repository = Repository.getInstance(RemoteDataSource.getInstance(), LocalDataSource.getInstance(getContext()));
         presenter = new MealsByCountryPresenterImpl(this, repository);
     }
 

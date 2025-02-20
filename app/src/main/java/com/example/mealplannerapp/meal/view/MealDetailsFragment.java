@@ -1,4 +1,4 @@
-package com.example.mealplannerapp.meal;
+package com.example.mealplannerapp.meal.view;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,22 +16,25 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.example.mealplannerapp.R;
+import com.example.mealplannerapp.data.localDataSource.LocalDataSource;
 import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
 import com.example.mealplannerapp.data.repo.Repository;
 import com.example.mealplannerapp.meal.models.Meal;
 import com.example.mealplannerapp.meal.presenter.MealDetailsPresenter;
 import com.example.mealplannerapp.meal.presenter.MealDetailsPresenterImpl;
-import com.example.mealplannerapp.meal.view.MealView;
 
 import java.util.List;
 
-public class MealDetailsFragment extends Fragment implements MealView {
+public class MealDetailsFragment extends Fragment implements MealView,OnFavMealClickListener {
     private MealDetailsPresenter presenter;
     private ImageView mealImage;
     private TextView mealName, mealCategoryArea, mealInstructions, mealIngredients;
     private Button playVideoButton;
     private WebView youtubeWebView;
     private String mealId;
+    private Meal currentMeal;
+
+    private ImageView btnAddToFav;
 
     public MealDetailsFragment() {}
 
@@ -47,7 +50,10 @@ public class MealDetailsFragment extends Fragment implements MealView {
         mealIngredients = view.findViewById(R.id.mealIngredients);
         playVideoButton = view.findViewById(R.id.playVideoButton);
         youtubeWebView = view.findViewById(R.id.youtubeWebView);
-        Repository repository = Repository.getInstance(RemoteDataSource.getInstance());
+        btnAddToFav = view.findViewById(R.id.btn_addToFav);
+        Repository repository = Repository.getInstance(
+                RemoteDataSource.getInstance(),
+                LocalDataSource.getInstance(getContext().getApplicationContext()));
 
         presenter = new MealDetailsPresenterImpl(this,repository);
 
@@ -58,6 +64,14 @@ public class MealDetailsFragment extends Fragment implements MealView {
             Toast.makeText(getActivity(), "Meal ID is missing", Toast.LENGTH_SHORT).show();
         }
 
+        btnAddToFav.setOnClickListener(v -> {
+            if (currentMeal != null) {
+                onFavMealClick(currentMeal);
+            } else {
+                Toast.makeText(getContext(), "No meal loaded", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         return view;
     }
 
@@ -65,6 +79,7 @@ public class MealDetailsFragment extends Fragment implements MealView {
     public void showMeal(List<Meal> meals) {
         if (!meals.isEmpty()) {
             Meal meal = meals.get(0);
+            currentMeal = meal;
 
             mealName.setText(meal.getStrMeal());
             mealCategoryArea.setText(meal.getStrCategory() + " - " + meal.getStrArea());
@@ -102,5 +117,11 @@ public class MealDetailsFragment extends Fragment implements MealView {
     @Override
     public void showErrMsg(String errorMsg) {
         Toast.makeText(getActivity(), errorMsg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onFavMealClick(Meal meal) {
+        presenter.addToFav(meal);
+        Toast.makeText( getContext(), "Meal added to favorite", Toast.LENGTH_SHORT).show();
     }
 }

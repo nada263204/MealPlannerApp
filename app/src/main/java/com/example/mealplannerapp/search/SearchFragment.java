@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.mealplannerapp.R;
+import com.example.mealplannerapp.data.localDataSource.LocalDataSource;
 import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
 import com.example.mealplannerapp.data.repo.Repository;
 import com.example.mealplannerapp.search.categories.presenter.CategoriesPresenter;
@@ -70,7 +71,7 @@ public class SearchFragment extends Fragment implements  OnIngredientClickListen
         countriesRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1, GridLayoutManager.HORIZONTAL, false));
         categoriesRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1, GridLayoutManager.HORIZONTAL, false));
 
-        Repository repository = Repository.getInstance(RemoteDataSource.getInstance());
+        Repository repository = Repository.getInstance(RemoteDataSource.getInstance(), LocalDataSource.getInstance(getContext()));
         ingredientPresenter = new IngredientPresenterImpl(this, repository);
         countriesPresenter = new CountriesPresenterImpl(this, repository);
         categoriesPresenter = new CategoriesPresenterImpl(this, repository);

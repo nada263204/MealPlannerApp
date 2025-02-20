@@ -1,5 +1,6 @@
 package com.example.mealplannerapp.Home;
 
+import android.content.Context;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,9 +16,10 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.mealplannerapp.R;
+import com.example.mealplannerapp.data.localDataSource.LocalDataSource;
 import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
 import com.example.mealplannerapp.data.repo.Repository;
-import com.example.mealplannerapp.meal.MealDetailsFragment;
+import com.example.mealplannerapp.meal.view.MealDetailsFragment;
 import com.example.mealplannerapp.meal.models.Meal;
 import com.example.mealplannerapp.meal.presenter.MealPresenter;
 import com.example.mealplannerapp.meal.presenter.MealPresenterImpl;
@@ -53,7 +55,7 @@ public class HomeFragment extends Fragment implements MealView {
         mealId = view.findViewById(R.id.mealId);
         mealCard = view.findViewById(R.id.mealCard);
 
-        Repository repository = Repository.getInstance(RemoteDataSource.getInstance());
+        Repository repository = Repository.getInstance(RemoteDataSource.getInstance(), LocalDataSource.getInstance(getContext()));
         mealPresenter = new MealPresenterImpl(this, repository);
 
         mealPresenter.getMeals();
