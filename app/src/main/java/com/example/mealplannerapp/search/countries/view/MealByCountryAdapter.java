@@ -5,19 +5,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.example.mealplannerapp.R;
-import com.example.mealplannerapp.meal.view.OnMealClickListener;
 import com.example.mealplannerapp.meal.models.MealBy;
+import com.example.mealplannerapp.meal.view.OnMealClickListener;
+
 import java.util.List;
 
-public class MealByCountryRecyclerViewAdapter extends RecyclerView.Adapter<MealViewHolder> {
+public class MealByCountryAdapter extends RecyclerView.Adapter<MealViewHolder> {
     private List<MealBy> mealsList;
     private OnMealClickListener listener;
 
-    public MealByCountryRecyclerViewAdapter(List<MealBy> mealsList, OnMealClickListener listener) {
+    public MealByCountryAdapter(List<MealBy> mealsList, OnMealClickListener listener) {
         this.mealsList = mealsList;
         this.listener = listener;
     }
@@ -53,7 +56,7 @@ public class MealByCountryRecyclerViewAdapter extends RecyclerView.Adapter<MealV
     public void updateMeals(List<MealBy> newMeals) {
         this.mealsList.clear();
         this.mealsList.addAll(newMeals);
-        notifyItemRangeChanged(0, newMeals.size());
+        notifyDataSetChanged();
     }
 }
 
@@ -67,4 +70,3 @@ class MealViewHolder extends RecyclerView.ViewHolder {
         mealImage = itemView.findViewById(R.id.iv_meal);
     }
 }
-

@@ -55,8 +55,9 @@ public class MealsByCategoryAdapter extends RecyclerView.Adapter<MealViewHolder>
     public void updateMeals(List<MealBy> newMeals) {
         this.mealsList.clear();
         this.mealsList.addAll(newMeals);
-        notifyItemRangeChanged(0, newMeals.size());
+        notifyDataSetChanged();
     }
+
 }
 
 

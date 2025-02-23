@@ -1,31 +1,46 @@
 package com.example.mealplannerapp.search.countries.view;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
+
 import com.example.mealplannerapp.R;
 import com.example.mealplannerapp.data.localDataSource.LocalDataSource;
 import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
 import com.example.mealplannerapp.data.repo.Repository;
+import com.example.mealplannerapp.meal.models.MealBy;
 import com.example.mealplannerapp.meal.view.MealDetailsFragment;
 import com.example.mealplannerapp.meal.view.OnMealClickListener;
+import com.example.mealplannerapp.search.categories.view.MealsByCategoryAdapter;
 import com.example.mealplannerapp.search.countries.presenter.MealsByCountryPresenter;
 import com.example.mealplannerapp.search.countries.presenter.MealsByCountryPresenterImpl;
-import com.example.mealplannerapp.meal.models.MealBy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 
 public class MealsByCountryFragment extends Fragment implements MealByCountryView, OnMealClickListener {
+
     private RecyclerView recyclerView;
-    private MealByCountryRecyclerViewAdapter adapter;
+    private MealByCountryAdapter adapter;
     private MealsByCountryPresenter presenter;
+    private EditText searchInput;
+    private final CompositeDisposable disposables = new CompositeDisposable();
+    private List<MealBy> allMeals = new ArrayList<>();
     private String countryName;
 
     public MealsByCountryFragment() {}
@@ -39,14 +54,16 @@ public class MealsByCountryFragment extends Fragment implements MealByCountryVie
         }
 
         if (countryName == null || countryName.isEmpty()) {
-            showToast("No ingredient name found");
+            showToast("No country name found");
             return;
         }
 
-        Repository repository = Repository.getInstance(RemoteDataSource.getInstance(), LocalDataSource.getInstance(getContext()));
+        Repository repository = Repository.getInstance(
+                RemoteDataSource.getInstance(),
+                LocalDataSource.getInstance(getContext())
+        );
         presenter = new MealsByCountryPresenterImpl(this, repository);
     }
-
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -55,14 +72,53 @@ public class MealsByCountryFragment extends Fragment implements MealByCountryVie
         recyclerView = view.findViewById(R.id.recycler_meals_by_country);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        adapter = new MealByCountryRecyclerViewAdapter(new ArrayList<>(), this);
+        adapter = new MealByCountryAdapter(new ArrayList<>(), this);
         recyclerView.setAdapter(adapter);
 
-        if (countryName != null && !countryName.isEmpty()) {
-            presenter.getMealsByCountry(countryName);
-        }
+        searchInput = view.findViewById(R.id.et_search_country);
+
+        presenter.getMealsByCountry(countryName);
+
+        setupSearchObservable();
 
         return view;
+    }
+
+    private void setupSearchObservable() {
+        disposables.add(
+                Observable.create(emitter -> searchInput.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+                            @Override
+                            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                                emitter.onNext(charSequence.toString().trim());
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable editable) {}
+                        }))
+                        .debounce(300, TimeUnit.MILLISECONDS)
+                        .map(text -> text.toString().trim())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(this::filterMeals, throwable -> showToast("Error filtering meals"))
+        );
+    }
+
+    private void filterMeals(String query) {
+        List<MealBy> filteredList = new ArrayList<>();
+
+        if (query.isEmpty()) {
+            filteredList.addAll(allMeals);
+        } else {
+            for (MealBy meal : allMeals) {
+                if (meal.getName().toLowerCase().contains(query.toLowerCase())) {
+                    filteredList.add(meal);
+                }
+            }
+        }
+
+        adapter.updateMeals(filteredList);
     }
 
     @Override
@@ -71,6 +127,8 @@ public class MealsByCountryFragment extends Fragment implements MealByCountryVie
             showToast("No meals found for this country");
             return;
         }
+        allMeals.clear();
+        allMeals.addAll(meals);
         adapter.updateMeals(meals);
     }
 
@@ -103,5 +161,11 @@ public class MealsByCountryFragment extends Fragment implements MealByCountryVie
                 .replace(R.id.fragment_container, fragment)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        disposables.clear();
     }
 }
