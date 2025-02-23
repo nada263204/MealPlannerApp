@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".search.ingedients.view.MealsByIngredientFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <EditText
+        android:id="@+id/et_search_ingredient"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Search meals by ingredient"
+        android:padding="8dp"
+        android:background="@android:drawable/editbox_background"
+        android:inputType="text" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_meals_by_ingredient"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="8dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:clipToPadding="false"
+        android:padding="8dp"
         android:scrollbars="vertical" />
 
-</FrameLayout>
+</LinearLayout>

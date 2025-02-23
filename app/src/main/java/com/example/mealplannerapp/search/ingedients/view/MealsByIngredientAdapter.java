@@ -29,6 +29,10 @@ public class MealsByIngredientAdapter extends RecyclerView.Adapter<MealViewHolde
         return new MealViewHolder(view);
     }
 
+    public void setFilteredList(List<MealBy> meals){
+        this.mealsList=meals;
+    }
+
     @Override
     public void onBindViewHolder(@NonNull MealViewHolder holder, int position) {
         MealBy meal = mealsList.get(position);
