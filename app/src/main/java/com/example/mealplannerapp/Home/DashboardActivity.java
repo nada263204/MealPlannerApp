@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
-import com.example.mealplannerapp.calender.CalenderFragment;
+import com.example.mealplannerapp.schedule.CalendarFragment;
 import com.example.mealplannerapp.favorite.FavoritesFragment;
 import com.example.mealplannerapp.R;
 import com.example.mealplannerapp.search.SearchFragment;
@@ -46,7 +46,7 @@ public class DashboardActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_search) {
                 selectedFragment = new SearchFragment();
             } else if (itemId == R.id.nav_calendar) {
-                selectedFragment = new CalenderFragment();
+                selectedFragment = new CalendarFragment();
             } else if (itemId == R.id.nav_favorites) {
                 selectedFragment = new FavoritesFragment();
             }
