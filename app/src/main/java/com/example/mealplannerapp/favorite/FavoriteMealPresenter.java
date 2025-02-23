@@ -6,4 +6,6 @@ public interface FavoriteMealPresenter {
 
     void getFavorite();
     void deleteFavorite(Meal meal);
+
+
 }

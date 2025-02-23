@@ -20,7 +20,7 @@ public class FavoriteMealPresenterImpl implements  FavoriteMealPresenter{
     }
     @Override
     public void getFavorite() {
-        _repo.getMealProducts()
+        _repo.getFavoriteMeals()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -39,4 +39,6 @@ public class FavoriteMealPresenterImpl implements  FavoriteMealPresenter{
                         error -> Log.d(TAG, "error while deleteing From Favorite")
                 );
     }
+
+
 }

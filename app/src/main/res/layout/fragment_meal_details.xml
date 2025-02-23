@@ -104,6 +104,15 @@
                     app:layout_constraintTop_toBottomOf="@id/mealInstructions"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
+                <Button
+                    android:id="@+id/btn_addToCalendar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Add to Calendar"
+                    app:layout_constraintTop_toBottomOf="@id/playVideoButton"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
                 <ImageView
                     android:id="@+id/btn_addToFav"

@@ -9,10 +9,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
 import com.example.mealplannerapp.R;
@@ -22,19 +22,16 @@ import com.example.mealplannerapp.data.repo.Repository;
 import com.example.mealplannerapp.meal.models.Meal;
 import com.example.mealplannerapp.meal.presenter.MealDetailsPresenter;
 import com.example.mealplannerapp.meal.presenter.MealDetailsPresenterImpl;
-
 import java.util.List;
 
-public class MealDetailsFragment extends Fragment implements MealView,OnFavMealClickListener {
+public class MealDetailsFragment extends Fragment implements MealView, OnFavMealClickListener, MealTypeDialogFragment.OnMealTypeSelectedListener {
     private MealDetailsPresenter presenter;
-    private ImageView mealImage;
+    private ImageView mealImage, btnAddToFav;
     private TextView mealName, mealCategoryArea, mealInstructions, mealIngredients;
-    private Button playVideoButton;
+    private Button playVideoButton, btnAddToCalendar;
     private WebView youtubeWebView;
     private String mealId;
     private Meal currentMeal;
-
-    private ImageView btnAddToFav;
 
     public MealDetailsFragment() {}
 
@@ -51,24 +48,30 @@ public class MealDetailsFragment extends Fragment implements MealView,OnFavMealC
         playVideoButton = view.findViewById(R.id.playVideoButton);
         youtubeWebView = view.findViewById(R.id.youtubeWebView);
         btnAddToFav = view.findViewById(R.id.btn_addToFav);
+        btnAddToCalendar = view.findViewById(R.id.btn_addToCalendar);
+
         Repository repository = Repository.getInstance(
                 RemoteDataSource.getInstance(),
-                LocalDataSource.getInstance(getContext().getApplicationContext()));
+                LocalDataSource.getInstance(requireContext()));
 
-        presenter = new MealDetailsPresenterImpl(this,repository);
+        presenter = new MealDetailsPresenterImpl(this, repository);
 
-        if (getArguments() != null) {
+        if (getArguments() != null && getArguments().containsKey("MEAL_ID")) {
             mealId = getArguments().getString("MEAL_ID");
             presenter.getMealById(mealId);
         } else {
-            Toast.makeText(getActivity(), "Meal ID is missing", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Meal ID is missing", Toast.LENGTH_SHORT).show();
         }
 
         btnAddToFav.setOnClickListener(v -> {
             if (currentMeal != null) {
                 onFavMealClick(currentMeal);
-            } else {
-                Toast.makeText(getContext(), "No meal loaded", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        btnAddToCalendar.setOnClickListener(v -> {
+            if (currentMeal != null) {
+                openMealTypeDialog();
             }
         });
 
@@ -84,44 +87,33 @@ public class MealDetailsFragment extends Fragment implements MealView,OnFavMealC
             mealName.setText(meal.getStrMeal());
             mealCategoryArea.setText(meal.getStrCategory() + " - " + meal.getStrArea());
             mealInstructions.setText(meal.getStrInstructions());
-
             Glide.with(requireContext()).load(meal.getStrMealThumb()).into(mealImage);
-
-            StringBuilder ingredientsList = new StringBuilder();
-            for (int i = 1; i <= 20; i++) {
-                String ingredient = meal.getIngredient(i);
-                String measure = meal.getMeasure(i);
-                if (ingredient != null && !ingredient.isEmpty()) {
-                    ingredientsList.append(ingredient).append(" - ").append(measure).append("\n");
-                }
-            }
-            mealIngredients.setText(ingredientsList.toString());
-
-            if (meal.getStrYoutube() != null && !meal.getStrYoutube().isEmpty()) {
-                playVideoButton.setOnClickListener(v -> {
-                    String videoId = meal.getStrYoutube().split("v=")[1];
-                    String embedUrl = "https://www.youtube.com/embed/" + videoId + "?autoplay=1";
-                    youtubeWebView.getSettings().setJavaScriptEnabled(true);
-                    youtubeWebView.loadUrl(embedUrl);
-                    youtubeWebView.setVisibility(View.VISIBLE);
-                });
-            } else {
-                playVideoButton.setEnabled(false);
-                playVideoButton.setText("No Video Available");
-            }
-        } else {
-            Toast.makeText(getActivity(), "No meal found", Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
-    public void showErrMsg(String errorMsg) {
-        Toast.makeText(getActivity(), errorMsg, Toast.LENGTH_SHORT).show();
+    public void showErrMsg(String error) {
+    }
+
+    @Override
+    public void onMealTypeSelected(String mealType, String date) {
+        if (currentMeal != null) {
+            presenter.addMealToCalendar(currentMeal, mealType, date);
+            Toast.makeText(requireContext(), "Meal added to " + mealType + " on " + date, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void openMealTypeDialog() {
+        MealTypeDialogFragment dialogFragment = new MealTypeDialogFragment();
+        dialogFragment.setTargetFragment(this, 0);
+        FragmentManager fragmentManager = getParentFragmentManager();
+        dialogFragment.show(fragmentManager, "MealTypeDialogFragment");
     }
 
     @Override
     public void onFavMealClick(Meal meal) {
         presenter.addToFav(meal);
-        Toast.makeText( getContext(), "Meal added to favorite", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), "Meal added to favorite", Toast.LENGTH_SHORT).show();
     }
+
 }
