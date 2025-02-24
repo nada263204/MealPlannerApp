@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MealDetailsFragment extends Fragment implements MealView, OnFavMealClickListener, MealTypeDialogFragment.OnMealTypeSelectedListener {
+public class MealDetailsFragment extends Fragment implements HomeView, OnFavMealClickListener, MealTypeDialogFragment.OnMealTypeSelectedListener {
     private MealDetailsPresenter presenter;
     private ImageView mealImage, btnAddToFav;
     private TextView mealName, mealCategoryArea, mealInstructions, mealIngredients;

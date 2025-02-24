@@ -4,17 +4,17 @@ import android.util.Log;
 
 import com.example.mealplannerapp.data.repo.Repository;
 import com.example.mealplannerapp.meal.models.Meal;
-import com.example.mealplannerapp.meal.view.MealView;
+import com.example.mealplannerapp.meal.view.HomeView;
 import com.example.mealplannerapp.schedule.model.ScheduledMeal;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 public class MealDetailsPresenterImpl implements MealDetailsPresenter {
-    private final MealView _view;
+    private final HomeView _view;
     private final Repository _repo;
 
-    public MealDetailsPresenterImpl(MealView view, Repository repo) {
+    public MealDetailsPresenterImpl(HomeView view, Repository repo) {
         this._view = view;
         this._repo = repo;
     }

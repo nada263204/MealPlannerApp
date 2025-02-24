@@ -62,6 +62,8 @@ dependencies {
     implementation("com.github.akarnokd:rxjava3-retrofit-adapter:3.0.0")
     implementation("androidx.room:room-rxjava2:2.6.1")
     implementation ("com.google.firebase:firebase-firestore:24.10.0")
+    implementation ("com.google.android.gms:play-services-auth:20.7.0")
+
 
 
 }
