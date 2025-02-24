@@ -1,40 +1,36 @@
 package com.example.mealplannerapp.Home.view;
 
+import android.content.Context;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.example.mealplannerapp.R;
 import com.example.mealplannerapp.data.FirestoreDataSource.FirestoreDataSource;
 import com.example.mealplannerapp.data.localDataSource.LocalDataSource;
 import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
+import com.example.mealplannerapp.Home.presenter.HomePresenter;
+import com.example.mealplannerapp.Home.presenter.HomePresenterImpl;
 import com.example.mealplannerapp.data.repo.Repository;
-import com.example.mealplannerapp.meal.view.MealDetailsFragment;
 import com.example.mealplannerapp.meal.models.Meal;
-import com.example.mealplannerapp.meal.presenter.MealPresenter;
-import com.example.mealplannerapp.meal.presenter.MealPresenterImpl;
-import com.example.mealplannerapp.meal.view.MealView;
-
+import com.example.mealplannerapp.meal.view.HomeView;
+import com.example.mealplannerapp.meal.view.MealDetailsFragment;
 import java.util.List;
 
-public class HomeFragment extends Fragment implements MealView {
-    private static final String TAG = "HomeFragment";
-
-    private ImageView mealImage;
+public class HomeFragment extends Fragment implements HomeView {
+    private ImageView mealImage, logoutIcon;
     private TextView mealTitle, mealId, usernameTextView;
     private CardView mealCard;
     private String mealIdValue;
-    private MealPresenter mealPresenter;
+    private HomePresenter homePresenter;
 
     public HomeFragment() {}
 
@@ -44,21 +40,25 @@ public class HomeFragment extends Fragment implements MealView {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         usernameTextView = view.findViewById(R.id.usernameTextView);
-        Bundle args = getArguments();
-        if (args != null) {
-            String username = args.getString("USERNAME", "User");
-            usernameTextView.setText("Hi, " + username + "!");
-        }
-
         mealImage = view.findViewById(R.id.mealImage);
         mealTitle = view.findViewById(R.id.mealTitle);
         mealId = view.findViewById(R.id.mealId);
         mealCard = view.findViewById(R.id.mealCard);
+        logoutIcon = view.findViewById(R.id.logoutIcon);
 
-        Repository repository = Repository.getInstance(RemoteDataSource.getInstance(), LocalDataSource.getInstance(getContext()), new FirestoreDataSource());
-        mealPresenter = new MealPresenterImpl(this, repository);
+        if (getArguments() != null) {
+            String username = getArguments().getString("USERNAME", "User");
+            usernameTextView.setText("Hi, " + username + "!");
+        }
 
-        mealPresenter.getMeals();
+        Repository homeRepository = Repository.getInstance(
+                RemoteDataSource.getInstance(),
+                LocalDataSource.getInstance(requireContext()),
+                new FirestoreDataSource()
+        );
+
+        homePresenter = new HomePresenterImpl(this, homeRepository, requireContext());
+        homePresenter.getMeals();
 
         mealCard.setOnClickListener(v -> {
             if (mealIdValue != null) {
@@ -72,9 +72,11 @@ public class HomeFragment extends Fragment implements MealView {
                         .addToBackStack(null)
                         .commit();
             } else {
-                Toast.makeText(getActivity(), "Meal ID is not available", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Meal ID is not available", Toast.LENGTH_SHORT).show();
             }
         });
+
+        logoutIcon.setOnClickListener(v -> homePresenter.logoutUser());
 
         return view;
     }
@@ -83,15 +85,10 @@ public class HomeFragment extends Fragment implements MealView {
     public void showMeal(List<Meal> meals) {
         if (meals != null && !meals.isEmpty()) {
             Meal meal = meals.get(0);
-
             mealIdValue = meal.getIdMeal();
-
             mealTitle.setText(meal.getStrMeal());
             mealId.setText("Meal ID: " + mealIdValue);
-
-            Glide.with(requireContext())
-                    .load(meal.getStrMealThumb())
-                    .into(mealImage);
+            Glide.with(requireContext()).load(meal.getStrMealThumb()).into(mealImage);
         } else {
             showErrMsg("No meal found");
         }
@@ -99,7 +96,6 @@ public class HomeFragment extends Fragment implements MealView {
 
     @Override
     public void showErrMsg(String error) {
-        Log.e(TAG, "Error: " + error);
-        Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show();
     }
 }

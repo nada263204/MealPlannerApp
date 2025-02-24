@@ -19,6 +19,8 @@ import com.example.mealplannerapp.favorite.model.OnDeleteClickListener;
 import com.example.mealplannerapp.favorite.presenter.FavoriteMealPresenter;
 import com.example.mealplannerapp.favorite.presenter.FavoriteMealPresenterImpl;
 import com.example.mealplannerapp.meal.models.Meal;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,26 +58,45 @@ public class FavoritesFragment extends Fragment implements OnDeleteClickListener
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        presenter.getFavorite();
+        checkUserAndFetchFavorites();
+    }
+
+    private void checkUserAndFetchFavorites() {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser user = auth.getCurrentUser();
+
+        if (user != null) {
+            presenter.getFavorite();
+        } else {
+            showErrMsg("User not authenticated");
+        }
     }
 
     @Override
     public void showFavoriteMeals(List<Meal> meals) {
-        if (meals != null) {
+        if (meals != null && !meals.isEmpty()) {
             favoriteMealAdapter.updateData(meals);
         } else {
-            Toast.makeText(getContext(), "No favorites found", Toast.LENGTH_SHORT).show();
+            showErrMsg("No favorites found");
         }
     }
 
     @Override
     public void showErrMsg(String error) {
-        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+        if (isAdded()) {
+            Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
     public void onDeleteClick(Meal meal) {
         presenter.deleteFavorite(meal);
-        Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
+        showErrMsg("Removed from favorites");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        presenter = null;
     }
 }

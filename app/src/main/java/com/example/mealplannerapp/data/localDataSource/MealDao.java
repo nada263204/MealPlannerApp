@@ -15,6 +15,7 @@ import io.reactivex.Flowable;
 
 @Dao
 public interface MealDao {
+
     @Query("SELECT * FROM favorite_meals")
     Flowable<List<Meal>> getAllFavMeals();
 
@@ -23,4 +24,7 @@ public interface MealDao {
 
     @Delete
     Completable deleteMealFromFav(Meal meal);
+
+    @Query("DELETE FROM favorite_meals")
+    Completable deleteAllFavoriteMeals();
 }

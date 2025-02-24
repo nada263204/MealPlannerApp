@@ -66,4 +66,8 @@ public class LocalDataSource {
     public Completable clearAllScheduledMeals() {
         return scheduledMealDao.clearAllScheduledMeals();
     }
+
+    public Completable clearAllFavoriteMeals() {
+        return mealDao.deleteAllFavoriteMeals();
+    }
 }

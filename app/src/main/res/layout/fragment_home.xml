@@ -7,6 +7,20 @@
     android:layout_height="match_parent"
     tools:context=".Home.view.HomeFragment">
 
+    <ImageView
+        android:id="@+id/logoutIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/logout"
+        android:contentDescription="Logout"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+
     <TextView
         android:id="@+id/usernameTextView"
         android:layout_width="wrap_content"

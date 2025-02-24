@@ -28,6 +28,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.android.gms.common.SignInButton;
 
@@ -36,14 +37,12 @@ public class LoginActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 100;
     private FirebaseAuth auth;
     private GoogleSignInClient googleSignInClient;
+    private SharedPreferences sharedPreferences;
 
     private EditText loginEmail, loginPassword;
-    TextView forgotPassword;
-    private TextView signupRedirectText;
+    private TextView forgotPassword, signupRedirectText;
     private Button loginButton;
     private SignInButton googleSignInButton;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +50,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         auth = FirebaseAuth.getInstance();
+        sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE);
+
         loginEmail = findViewById(R.id.login_email);
         loginPassword = findViewById(R.id.login_password);
         loginButton = findViewById(R.id.login_button);
@@ -65,83 +66,39 @@ public class LoginActivity extends AppCompatActivity {
 
         googleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        loginButton.setOnClickListener(view -> {
-            String email = loginEmail.getText().toString();
-            String password = loginPassword.getText().toString();
+        if (auth.getCurrentUser() != null) {
+            navigateToDashboard();
+        }
 
-            if (!email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                if (!password.isEmpty()) {
-                    auth.signInWithEmailAndPassword(email, password)
-                            .addOnSuccessListener(authResult -> {
-                                Toast.makeText(LoginActivity.this, "Login success", Toast.LENGTH_SHORT).show();
-
-                                String username = email.substring(0, email.indexOf("@"));
-
-                                Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
-                                intent.putExtra("USERNAME", username);
-                                startActivity(intent);
-                                finish();
-                            })
-                            .addOnFailureListener(e -> Toast.makeText(LoginActivity.this, "Login failed", Toast.LENGTH_SHORT).show());
-                } else {
-                    loginPassword.setError("Password cannot be empty");
-                }
-            } else if (email.isEmpty()) {
-                loginEmail.setError("Email cannot be empty");
-            } else {
-                loginEmail.setError("Please enter a valid email");
-            }
-        });
-
-
+        loginButton.setOnClickListener(view -> loginUser());
         googleSignInButton.setOnClickListener(view -> signInWithGoogle());
+        signupRedirectText.setOnClickListener(view -> startActivity(new Intent(LoginActivity.this, SignUpActivity.class)));
+        forgotPassword.setOnClickListener(view -> showForgotPasswordDialog());
+    }
 
-        signupRedirectText.setOnClickListener(view -> {
-            Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
-            startActivity(intent);
-        });
+    private void loginUser() {
+        String email = loginEmail.getText().toString();
+        String password = loginPassword.getText().toString();
 
-        forgotPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                View dialogView = getLayoutInflater().inflate(R.layout.dialoge_forgot, null);
-                EditText emailBox = dialogView.findViewById(R.id.emailBox);
-                builder.setView(dialogView);
-                AlertDialog dialog = builder.create();
-                dialogView.findViewById(R.id.btnReset).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        String userEmail = emailBox.getText().toString();
-                        if (TextUtils.isEmpty(userEmail) && !Patterns.EMAIL_ADDRESS.matcher(userEmail).matches()){
-                            Toast.makeText(LoginActivity.this, "Enter your registered email id", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        auth.sendPasswordResetEmail(userEmail).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()){
-                                    Toast.makeText(LoginActivity.this, "Check your email", Toast.LENGTH_SHORT).show();
-                                    dialog.dismiss();
-                                } else {
-                                    Toast.makeText(LoginActivity.this, "Unable to send, failed", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
-                    }
-                });
-                dialogView.findViewById(R.id.btnCancel).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dialog.dismiss();
-                    }
-                });
-                if (dialog.getWindow() != null){
-                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-                }
-                dialog.show();
-            }
-        });
+        if (TextUtils.isEmpty(email)) {
+            loginEmail.setError("Email cannot be empty");
+            return;
+        }
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            loginEmail.setError("Please enter a valid email");
+            return;
+        }
+        if (TextUtils.isEmpty(password)) {
+            loginPassword.setError("Password cannot be empty");
+            return;
+        }
+
+        auth.signInWithEmailAndPassword(email, password)
+                .addOnSuccessListener(authResult -> {
+                    saveLoginState();
+                    navigateToDashboard();
+                })
+                .addOnFailureListener(e -> Toast.makeText(LoginActivity.this, "Login failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private void signInWithGoogle() {
@@ -170,29 +127,63 @@ public class LoginActivity extends AppCompatActivity {
         auth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(LoginActivity.this, "Google Sign-In Successful", Toast.LENGTH_SHORT).show();
-
-                        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putBoolean("isGuest", false);
-                        editor.apply();
-
-                        String email = account.getEmail();
-                        String username = "";
-
-                        if (email != null && email.contains("@")) {
-                            username = email.substring(0, email.indexOf("@"));
-                        }
-
-                        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
-                        intent.putExtra("USERNAME", username);
-                        startActivity(intent);
-                        finish();
+                        saveLoginState();
+                        navigateToDashboard();
                     } else {
                         Toast.makeText(LoginActivity.this, "Authentication Failed!", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
+    private void showForgotPasswordDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialoge_forgot, null);
+        EditText emailBox = dialogView.findViewById(R.id.emailBox);
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+
+        dialogView.findViewById(R.id.btnReset).setOnClickListener(view -> {
+            String userEmail = emailBox.getText().toString();
+            if (TextUtils.isEmpty(userEmail) || !Patterns.EMAIL_ADDRESS.matcher(userEmail).matches()) {
+                Toast.makeText(LoginActivity.this, "Enter a valid email", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            auth.sendPasswordResetEmail(userEmail).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(LoginActivity.this, "Check your email", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                } else {
+                    Toast.makeText(LoginActivity.this, "Failed to send reset email", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+
+        dialogView.findViewById(R.id.btnCancel).setOnClickListener(view -> dialog.dismiss());
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        }
+        dialog.show();
+    }
+
+    private void saveLoginState() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("isLoggedIn", true);
+        editor.apply();
+    }
+
+    private void navigateToDashboard() {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user != null) {
+            String email = user.getEmail();
+            String username = email != null ? email.split("@")[0] : "User";
+
+            Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+            intent.putExtra("USERNAME", username);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        }
+    }
 
 }

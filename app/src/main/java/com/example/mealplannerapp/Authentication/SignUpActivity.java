@@ -60,7 +60,6 @@ public class SignUpActivity extends AppCompatActivity {
                                         editor.putBoolean("isGuest", false);
                                         editor.apply();
 
-                                        // Extract username from email
                                         String username = user.split("@")[0];
 
                                         Intent intent = new Intent(SignUpActivity.this, DashboardActivity.class);

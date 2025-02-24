@@ -115,7 +115,13 @@ public class Repository {
     }
 
     public Completable clearAllScheduledMeals() {
+
         return localDataSource.clearAllScheduledMeals();
+    }
+
+    public Completable clearAllFavoriteMeals() {
+
+        return localDataSource.clearAllFavoriteMeals();
     }
 
     public Completable insertMealToCalendar(ScheduledMeal meal) {
