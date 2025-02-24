@@ -2,6 +2,7 @@ package com.example.mealplannerapp.Authentication;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -16,7 +17,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.mealplannerapp.Home.DashboardActivity;
+import com.example.mealplannerapp.Home.view.DashboardActivity;
 import com.example.mealplannerapp.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -171,6 +172,11 @@ public class LoginActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         Toast.makeText(LoginActivity.this, "Google Sign-In Successful", Toast.LENGTH_SHORT).show();
 
+                        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putBoolean("isGuest", false);
+                        editor.apply();
+
                         String email = account.getEmail();
                         String username = "";
 
@@ -187,5 +193,6 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
     }
+
 
 }

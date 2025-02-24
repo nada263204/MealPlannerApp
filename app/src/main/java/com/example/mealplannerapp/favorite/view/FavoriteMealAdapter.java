@@ -1,4 +1,4 @@
-package com.example.mealplannerapp.favorite;
+package com.example.mealplannerapp.favorite.view;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mealplannerapp.R;
+import com.example.mealplannerapp.favorite.model.OnDeleteClickListener;
 import com.example.mealplannerapp.meal.models.Meal;
 import com.squareup.picasso.Picasso;
 

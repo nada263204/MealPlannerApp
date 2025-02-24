@@ -3,15 +3,14 @@ package com.example.mealplannerapp.data.localDataSource;
 import android.content.Context;
 import android.util.Log;
 
-import com.example.mealplannerapp.schedule.ScheduledMeal;
-import com.example.mealplannerapp.schedule.ScheduledMealDao;
+import com.example.mealplannerapp.schedule.model.ScheduledMeal;
+import com.example.mealplannerapp.schedule.model.ScheduledMealDao;
 import com.example.mealplannerapp.meal.models.Meal;
 
 import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
-import io.reactivex.Single;
 
 public class LocalDataSource {
     private static final String TAG = "LocalDataSource";
@@ -67,6 +66,4 @@ public class LocalDataSource {
     public Completable clearAllScheduledMeals() {
         return scheduledMealDao.clearAllScheduledMeals();
     }
-
-
 }

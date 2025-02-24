@@ -1,4 +1,4 @@
-package com.example.mealplannerapp.schedule;
+package com.example.mealplannerapp.schedule.model;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -10,7 +10,6 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
-import io.reactivex.Single;
 
 @Dao
 public interface ScheduledMealDao {
@@ -23,8 +22,6 @@ public interface ScheduledMealDao {
 
     @Query("SELECT * FROM scheduled_meals WHERE date = :date")
     Flowable<List<ScheduledMeal>> getMealsByDate(String date);
-
-
 
     @Delete
     Completable deleteScheduledMeal(ScheduledMeal meal);

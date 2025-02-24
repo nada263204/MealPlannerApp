@@ -1,21 +1,13 @@
 package com.example.mealplannerapp.data.remoteDataSource;
 
-import android.util.Log;
-
 import com.example.mealplannerapp.meal.models.MealResponse;
-import com.example.mealplannerapp.search.categories.models.CategoriesCallback;
 import com.example.mealplannerapp.search.categories.models.CategoriesResponse;
-import com.example.mealplannerapp.search.countries.models.CountriesCallBack;
 import com.example.mealplannerapp.search.countries.models.CountryResponse;
 import com.example.mealplannerapp.search.ingedients.models.IngredientResponse;
-import com.example.mealplannerapp.meal.models.MealByCallback;
 import com.example.mealplannerapp.meal.models.MealByResponse;
 
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;

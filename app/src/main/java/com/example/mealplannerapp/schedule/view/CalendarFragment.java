@@ -1,4 +1,4 @@
-package com.example.mealplannerapp.schedule;
+package com.example.mealplannerapp.schedule.view;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -14,19 +14,23 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mealplannerapp.R;
+import com.example.mealplannerapp.data.FirestoreDataSource.FirestoreDataSource;
 import com.example.mealplannerapp.data.localDataSource.LocalDataSource;
 import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
 import com.example.mealplannerapp.data.repo.Repository;
-import com.example.mealplannerapp.meal.models.Meal;
+import com.example.mealplannerapp.schedule.model.OnMealDeleteClickListener;
+import com.example.mealplannerapp.schedule.presenter.CalendarPresenter;
+import com.example.mealplannerapp.schedule.presenter.CalendarPresenterImpl;
+import com.example.mealplannerapp.schedule.model.ScheduledMeal;
 import com.google.android.material.datepicker.MaterialDatePicker;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class CalendarFragment extends Fragment implements CalendarView {
+public class CalendarFragment extends Fragment implements CalendarView, OnMealDeleteClickListener {
+    private static final String TAG = "CalendarFragment";
 
     private RecyclerView breakfastRecycler, lunchRecycler, dinnerRecycler;
     private MealAdapter breakfastAdapter, lunchAdapter, dinnerAdapter;
@@ -47,10 +51,9 @@ public class CalendarFragment extends Fragment implements CalendarView {
         lunchRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         dinnerRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        breakfastAdapter = new MealAdapter();
-        lunchAdapter = new MealAdapter();
-        dinnerAdapter = new MealAdapter();
-
+        breakfastAdapter = new MealAdapter(this);
+        lunchAdapter = new MealAdapter(this);
+        dinnerAdapter = new MealAdapter(this);
 
         breakfastRecycler.setAdapter(breakfastAdapter);
         lunchRecycler.setAdapter(lunchAdapter);
@@ -58,7 +61,8 @@ public class CalendarFragment extends Fragment implements CalendarView {
 
         Repository repository = Repository.getInstance(
                 RemoteDataSource.getInstance(),
-                LocalDataSource.getInstance(requireContext().getApplicationContext())
+                LocalDataSource.getInstance(requireContext().getApplicationContext()),
+                new FirestoreDataSource()
         );
 
         presenter = new CalendarPresenterImpl(repository, this);
@@ -67,7 +71,7 @@ public class CalendarFragment extends Fragment implements CalendarView {
         dateTextView.setText(selectedDate);
         dateTextView.setOnClickListener(v -> openDatePicker());
 
-        presenter.loadMealsForDate(selectedDate);
+        loadMeals(selectedDate);
 
         return view;
     }
@@ -76,17 +80,34 @@ public class CalendarFragment extends Fragment implements CalendarView {
         return new SimpleDateFormat("yyyy-M-d", Locale.getDefault()).format(new Date());
     }
 
+    private void loadMeals(String date) {
+        presenter.loadMealsForDate(date);
+    }
+
     @Override
     public void showMealsForDate(List<ScheduledMeal> meals) {
+        if (meals == null || meals.isEmpty()) {
+            Log.d(TAG, "No meals found in Room, checking Firestore...");
+            presenter.loadMealsFromFirestore(selectedDate);
+        } else {
+            Log.d(TAG, "Meals loaded successfully from Room: " + meals.size());
+            updateMealAdapters(meals);
+        }
+    }
+
+    public void updateMealAdapters(List<ScheduledMeal> meals) {
         breakfastAdapter.updateData(presenter.filterMealsByType(meals, "Breakfast", selectedDate));
         lunchAdapter.updateData(presenter.filterMealsByType(meals, "Lunch", selectedDate));
         dinnerAdapter.updateData(presenter.filterMealsByType(meals, "Dinner", selectedDate));
     }
 
-
     @Override
     public void showError(String error) {
-        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+        try {
+            Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show();
+        } catch (IllegalStateException e) {
+            Log.e(TAG, "Fragment not attached to context. Error: " + error);
+        }
     }
 
     private void openDatePicker() {
@@ -94,10 +115,18 @@ public class CalendarFragment extends Fragment implements CalendarView {
         datePicker.addOnPositiveButtonClickListener(selection -> {
             selectedDate = new SimpleDateFormat("yyyy-M-d", Locale.getDefault()).format(new Date(selection));
             dateTextView.setText(selectedDate);
-            presenter.loadMealsForDate(selectedDate);
+            loadMeals(selectedDate);
         });
 
         datePicker.show(getParentFragmentManager(), "DATE_PICKER");
     }
 
+    @Override
+    public void onMealDelete(ScheduledMeal meal) {
+        presenter.deleteScheduledMeal(meal);
+
+        breakfastAdapter.removeMeal(meal);
+        lunchAdapter.removeMeal(meal);
+        dinnerAdapter.removeMeal(meal);
+    }
 }

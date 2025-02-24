@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mealplannerapp.R;
+import com.example.mealplannerapp.data.FirestoreDataSource.FirestoreDataSource;
 import com.example.mealplannerapp.data.localDataSource.LocalDataSource;
 import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
 import com.example.mealplannerapp.data.repo.Repository;
@@ -49,7 +50,7 @@ public class MealsByIngredientFragment extends Fragment implements MealsByIngred
 
         Repository repository = Repository.getInstance(
                 RemoteDataSource.getInstance(),
-                LocalDataSource.getInstance(getContext())
+                LocalDataSource.getInstance(getContext()), new FirestoreDataSource()
         );
         presenter = new MealsByIngredientPresenterImpl(this, repository);
     }

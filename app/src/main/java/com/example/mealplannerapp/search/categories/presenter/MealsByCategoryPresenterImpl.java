@@ -1,11 +1,7 @@
 package com.example.mealplannerapp.search.categories.presenter;
 
 import com.example.mealplannerapp.data.repo.Repository;
-import com.example.mealplannerapp.meal.models.MealBy;
-import com.example.mealplannerapp.meal.models.MealByCallback;
 import com.example.mealplannerapp.search.categories.view.MealsByCategoryView;
-
-import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
