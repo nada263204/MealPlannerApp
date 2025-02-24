@@ -6,8 +6,8 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-import com.example.mealplannerapp.schedule.ScheduledMeal;
-import com.example.mealplannerapp.schedule.ScheduledMealDao;
+import com.example.mealplannerapp.schedule.model.ScheduledMeal;
+import com.example.mealplannerapp.schedule.model.ScheduledMealDao;
 import com.example.mealplannerapp.meal.models.Meal;
 
 @Database(entities = {Meal.class, ScheduledMeal.class}, version = 2, exportSchema = false)

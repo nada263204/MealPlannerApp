@@ -1,4 +1,4 @@
-package com.example.mealplannerapp.schedule;
+package com.example.mealplannerapp.schedule.model;
 
 import androidx.room.Embedded;
 import androidx.room.Entity;

@@ -15,13 +15,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mealplannerapp.R;
+import com.example.mealplannerapp.data.FirestoreDataSource.FirestoreDataSource;
 import com.example.mealplannerapp.data.localDataSource.LocalDataSource;
 import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
 import com.example.mealplannerapp.data.repo.Repository;
 import com.example.mealplannerapp.meal.models.MealBy;
 import com.example.mealplannerapp.meal.view.MealDetailsFragment;
 import com.example.mealplannerapp.meal.view.OnMealClickListener;
-import com.example.mealplannerapp.search.categories.view.MealsByCategoryAdapter;
 import com.example.mealplannerapp.search.countries.presenter.MealsByCountryPresenter;
 import com.example.mealplannerapp.search.countries.presenter.MealsByCountryPresenterImpl;
 
@@ -60,7 +60,7 @@ public class MealsByCountryFragment extends Fragment implements MealByCountryVie
 
         Repository repository = Repository.getInstance(
                 RemoteDataSource.getInstance(),
-                LocalDataSource.getInstance(getContext())
+                LocalDataSource.getInstance(getContext()), new FirestoreDataSource()
         );
         presenter = new MealsByCountryPresenterImpl(this, repository);
     }

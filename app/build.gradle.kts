@@ -40,6 +40,8 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.firebase.auth)
     implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation(libs.firebase.storage)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -59,6 +61,7 @@ dependencies {
     implementation ("io.reactivex.rxjava2:rxandroid:2.1.1")
     implementation("com.github.akarnokd:rxjava3-retrofit-adapter:3.0.0")
     implementation("androidx.room:room-rxjava2:2.6.1")
+    implementation ("com.google.firebase:firebase-firestore:24.10.0")
 
 
 }

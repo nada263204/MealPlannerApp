@@ -1,4 +1,6 @@
-package com.example.mealplannerapp.schedule;
+package com.example.mealplannerapp.schedule.view;
+
+import com.example.mealplannerapp.schedule.model.ScheduledMeal;
 
 import java.util.List;
 

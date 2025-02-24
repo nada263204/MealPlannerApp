@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.mealplannerapp.R;
+import com.example.mealplannerapp.data.FirestoreDataSource.FirestoreDataSource;
 import com.example.mealplannerapp.data.localDataSource.LocalDataSource;
 import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
 import com.example.mealplannerapp.data.repo.Repository;
@@ -71,7 +72,7 @@ public class SearchFragment extends Fragment implements  OnIngredientClickListen
         countriesRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1, GridLayoutManager.HORIZONTAL, false));
         categoriesRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1, GridLayoutManager.HORIZONTAL, false));
 
-        Repository repository = Repository.getInstance(RemoteDataSource.getInstance(), LocalDataSource.getInstance(getContext()));
+        Repository repository = Repository.getInstance(RemoteDataSource.getInstance(), LocalDataSource.getInstance(getContext()), new FirestoreDataSource());
         ingredientPresenter = new IngredientPresenterImpl(this, repository);
         countriesPresenter = new CountriesPresenterImpl(this, repository);
         categoriesPresenter = new CategoriesPresenterImpl(this, repository);
@@ -91,12 +92,10 @@ public class SearchFragment extends Fragment implements  OnIngredientClickListen
         switch (section) {
             case "ingredients":
                 if (!isIngredientsExpanded) {
-                    // Expand Ingredients
                     ingredientsRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3, GridLayoutManager.HORIZONTAL, false));
                     btnExpandIngredients.setImageResource(R.drawable.ic_collapse);
                     isIngredientsExpanded = true;
 
-                    // Collapse Others
                     collapseRecyclerView("countries");
                     collapseRecyclerView("categories");
                 } else {
@@ -106,12 +105,10 @@ public class SearchFragment extends Fragment implements  OnIngredientClickListen
 
             case "countries":
                 if (!isCountriesExpanded) {
-                    // Expand Countries
                     countriesRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3, GridLayoutManager.HORIZONTAL, false));
                     btnExpandCountries.setImageResource(R.drawable.ic_collapse);
                     isCountriesExpanded = true;
 
-                    // Collapse Others
                     collapseRecyclerView("ingredients");
                     collapseRecyclerView("categories");
                 } else {
@@ -121,12 +118,10 @@ public class SearchFragment extends Fragment implements  OnIngredientClickListen
 
             case "categories":
                 if (!isCategoriesExpanded) {
-                    // Expand Categories
                     categoriesRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3, GridLayoutManager.HORIZONTAL, false));
                     btnExpandCategories.setImageResource(R.drawable.ic_collapse);
                     isCategoriesExpanded = true;
 
-                    // Collapse Others
                     collapseRecyclerView("ingredients");
                     collapseRecyclerView("countries");
                 } else {

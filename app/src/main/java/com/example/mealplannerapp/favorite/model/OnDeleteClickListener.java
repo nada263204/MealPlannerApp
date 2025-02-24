@@ -1,4 +1,4 @@
-package com.example.mealplannerapp.favorite;
+package com.example.mealplannerapp.favorite.model;
 
 import com.example.mealplannerapp.meal.models.Meal;
 
