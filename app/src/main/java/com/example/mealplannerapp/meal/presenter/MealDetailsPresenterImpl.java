@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.example.mealplannerapp.data.repo.Repository;
 import com.example.mealplannerapp.meal.models.Meal;
-import com.example.mealplannerapp.meal.view.HomeView;
+import com.example.mealplannerapp.Home.view.HomeView;
 import com.example.mealplannerapp.schedule.model.ScheduledMeal;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;

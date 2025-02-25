@@ -17,12 +17,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import com.bumptech.glide.Glide;
+import com.example.mealplannerapp.Home.view.HomeView;
 import com.example.mealplannerapp.R;
 import com.example.mealplannerapp.data.FirestoreDataSource.FirestoreDataSource;
 import com.example.mealplannerapp.data.localDataSource.LocalDataSource;
 import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
 import com.example.mealplannerapp.data.repo.Repository;
 import com.example.mealplannerapp.meal.models.Meal;
+import com.example.mealplannerapp.meal.models.MealBy;
 import com.example.mealplannerapp.meal.presenter.MealDetailsPresenter;
 import com.example.mealplannerapp.meal.presenter.MealDetailsPresenterImpl;
 import com.example.mealplannerapp.schedule.model.ScheduledMeal;
@@ -152,6 +154,16 @@ public class MealDetailsFragment extends Fragment implements HomeView, OnFavMeal
     @Override
     public void showErrMsg(String error) {
         Toast.makeText(requireContext(), "Error: " + error, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showScheduledMeals(List<ScheduledMeal> scheduledMeals) {
+
+    }
+
+    @Override
+    public void showLocationMeals(List<MealBy> meals) {
+
     }
 
     @Override
