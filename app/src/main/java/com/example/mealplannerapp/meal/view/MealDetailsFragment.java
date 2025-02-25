@@ -193,4 +193,5 @@ public class MealDetailsFragment extends Fragment implements HomeView, OnFavMeal
         presenter.addMealToFirestore(meal);
         Toast.makeText(requireContext(), "Meal added to favorite", Toast.LENGTH_SHORT).show();
     }
+
 }

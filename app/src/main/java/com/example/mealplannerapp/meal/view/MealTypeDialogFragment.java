@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,7 +26,7 @@ import java.util.Calendar;
 public class MealTypeDialogFragment extends DialogFragment {
 
     private Spinner mealTypeSpinner;
-    private Button btnSelectDate;
+    private ImageView btnSelectDate;
     private TextView selectedDateTextView;
     private OnMealTypeSelectedListener listener;
     private String selectedDate = "";
@@ -59,6 +60,10 @@ public class MealTypeDialogFragment extends DialogFragment {
 
         String[] mealTypes = {"Breakfast", "Lunch", "Dinner"};
         mealTypeSpinner.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, mealTypes));
+
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
 
         btnSelectDate.setOnClickListener(v -> showDatePickerDialog());
 

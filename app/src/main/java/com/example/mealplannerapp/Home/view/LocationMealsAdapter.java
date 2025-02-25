@@ -1,6 +1,8 @@
 package com.example.mealplannerapp.Home.view;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +22,9 @@ public class LocationMealsAdapter extends RecyclerView.Adapter<LocationMealsAdap
     private final Context context;
     private List<MealBy> mealList;
     private final OnMealClickListener listener;
+    private final Handler autoScrollHandler = new Handler(Looper.getMainLooper());
+    private int currentIndex = 0;
+    private RecyclerView recyclerView;
 
     public interface OnMealClickListener {
         void onMealClick(MealBy meal);
@@ -59,6 +64,31 @@ public class LocationMealsAdapter extends RecyclerView.Adapter<LocationMealsAdap
     public void updateMeals(List<MealBy> newMeals) {
         this.mealList = newMeals;
         notifyDataSetChanged();
+        startAutoScroll();
+    }
+
+    public void attachRecyclerView(RecyclerView recyclerView) {
+        this.recyclerView = recyclerView;
+    }
+
+    private void startAutoScroll() {
+        if (mealList == null || mealList.size() <= 1 || recyclerView == null) {
+            return;
+        }
+
+        autoScrollHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mealList.size() > 1) {
+                    currentIndex++;
+                    if (currentIndex >= mealList.size()) {
+                        currentIndex = 0;
+                    }
+                    recyclerView.smoothScrollToPosition(currentIndex);
+                    autoScrollHandler.postDelayed(this, 2000);
+                }
+            }
+        }, 2000);
     }
 
     public static class MealViewHolder extends RecyclerView.ViewHolder {

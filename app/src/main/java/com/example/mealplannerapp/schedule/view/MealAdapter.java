@@ -7,6 +7,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 import com.example.mealplannerapp.R;
 import com.example.mealplannerapp.schedule.model.OnMealDeleteClickListener;
 import com.example.mealplannerapp.schedule.model.ScheduledMeal;
@@ -56,12 +58,14 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
 
     public class MealViewHolder extends RecyclerView.ViewHolder {
         private TextView mealName;
+        private ImageView mealImage;
         private ImageView deleteButton;
 
         public MealViewHolder(@NonNull View itemView) {
             super(itemView);
             mealName = itemView.findViewById(R.id.tv_title);
             deleteButton = itemView.findViewById(R.id.delete_btn);
+            mealImage =itemView.findViewById(R.id.iv_meal);
 
             deleteButton.setOnClickListener(v -> {
                 if (deleteClickListener != null && getAdapterPosition() != RecyclerView.NO_POSITION) {
@@ -72,6 +76,11 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
 
         public void bind(ScheduledMeal meal) {
             mealName.setText(meal.getMeal().getStrMeal());
+
+            Glide.with(itemView.getContext())
+                    .load(meal.getMeal().getStrMealThumb())
+                    .placeholder(R.drawable.background)
+                    .into(mealImage);
         }
     }
 }

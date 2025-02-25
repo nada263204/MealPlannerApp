@@ -81,12 +81,12 @@ public class FavoritesFragment extends Fragment implements OnDeleteClickListener
         }
     }
 
-    @Override
-    public void showErrMsg(String error) {
-        if (isAdded()) {
-            Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show();
+    public void showErrMsg(String message) {
+        if (isAdded() && getContext() != null) {
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
         }
     }
+
 
     @Override
     public void onDeleteClick(Meal meal) {
