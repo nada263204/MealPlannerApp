@@ -131,7 +131,6 @@ public class Meal implements Parcelable {
         }
     };
 
-    // Getters
     public String getIdMeal() { return idMeal; }
     public String getStrMeal() { return strMeal; }
     public String getStrCategory() { return strCategory; }
@@ -211,7 +210,6 @@ public class Meal implements Parcelable {
         }
     }
 
-    // Setters for Ingredients
     public void setStrIngredient1(String strIngredient1) { this.strIngredient1 = strIngredient1; }
     public void setStrIngredient2(String strIngredient2) { this.strIngredient2 = strIngredient2; }
     public void setStrIngredient3(String strIngredient3) { this.strIngredient3 = strIngredient3; }

@@ -3,7 +3,7 @@ package com.example.mealplannerapp.schedule.presenter;
 import android.util.Log;
 
 import com.example.mealplannerapp.data.repo.Repository;
-import com.example.mealplannerapp.schedule.view.CalendarView;
+import com.example.mealplannerapp.schedule.view.PlanView;
 import com.example.mealplannerapp.schedule.model.ScheduledMeal;
 
 import java.util.ArrayList;
@@ -15,17 +15,17 @@ import io.reactivex.schedulers.Schedulers;
 
 public class CalendarPresenterImpl implements CalendarPresenter {
     private static final String TAG = "CalendarPresenterImpl";
-    private CalendarView view;
+    private PlanView view;
     private final Repository repository;
     private final CompositeDisposable disposables = new CompositeDisposable();
 
-    public CalendarPresenterImpl(Repository repository, CalendarView view) {
+    public CalendarPresenterImpl(Repository repository, PlanView view) {
         this.repository = repository;
         this.view = view;
     }
 
     @Override
-    public void attachView(CalendarView view) {
+    public void attachView(PlanView view) {
         this.view = view;
     }
 

@@ -1,13 +1,13 @@
 package com.example.mealplannerapp.schedule.presenter;
 
 
-import com.example.mealplannerapp.schedule.view.CalendarView;
+import com.example.mealplannerapp.schedule.view.PlanView;
 import com.example.mealplannerapp.schedule.model.ScheduledMeal;
 
 import java.util.List;
 
 public interface CalendarPresenter {
-    void attachView(CalendarView view);
+    void attachView(PlanView view);
     void detachView();
     void loadMealsForDate(String date);
     void loadMealsFromFirestore(String date);

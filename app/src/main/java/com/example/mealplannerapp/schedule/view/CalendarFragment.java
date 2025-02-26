@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.CalendarView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,31 +19,34 @@ import com.example.mealplannerapp.data.FirestoreDataSource.FirestoreDataSource;
 import com.example.mealplannerapp.data.localDataSource.LocalDataSource;
 import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
 import com.example.mealplannerapp.data.repo.Repository;
+import com.example.mealplannerapp.meal.models.OnScheduledMealClickListener;
+import com.example.mealplannerapp.meal.view.MealDetailsFragment;
 import com.example.mealplannerapp.schedule.model.OnMealDeleteClickListener;
 import com.example.mealplannerapp.schedule.presenter.CalendarPresenter;
 import com.example.mealplannerapp.schedule.presenter.CalendarPresenterImpl;
 import com.example.mealplannerapp.schedule.model.ScheduledMeal;
-import com.google.android.material.datepicker.MaterialDatePicker;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class CalendarFragment extends Fragment implements CalendarView, OnMealDeleteClickListener {
+public class CalendarFragment extends Fragment implements PlanView, OnMealDeleteClickListener, OnScheduledMealClickListener {
     private static final String TAG = "CalendarFragment";
 
     private RecyclerView breakfastRecycler, lunchRecycler, dinnerRecycler;
     private MealAdapter breakfastAdapter, lunchAdapter, dinnerAdapter;
     private CalendarPresenter presenter;
     private TextView dateTextView;
+    private CalendarView calendarView;
     private String selectedDate;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_calender, container, false);
 
-        dateTextView = view.findViewById(R.id.dateTextView);
+        dateTextView = view.findViewById(R.id.selectedDateText);
+        calendarView = view.findViewById(R.id.calendarView);
         breakfastRecycler = view.findViewById(R.id.breakfastRecycler);
         lunchRecycler = view.findViewById(R.id.lunchRecycler);
         dinnerRecycler = view.findViewById(R.id.dinnerRecycler);
@@ -51,9 +55,9 @@ public class CalendarFragment extends Fragment implements CalendarView, OnMealDe
         lunchRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         dinnerRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        breakfastAdapter = new MealAdapter(this);
-        lunchAdapter = new MealAdapter(this);
-        dinnerAdapter = new MealAdapter(this);
+        breakfastAdapter = new MealAdapter(this,this::onScheduledMealClick);
+        lunchAdapter = new MealAdapter(this,this::onScheduledMealClick);
+        dinnerAdapter = new MealAdapter(this,this::onScheduledMealClick);
 
         breakfastRecycler.setAdapter(breakfastAdapter);
         lunchRecycler.setAdapter(lunchAdapter);
@@ -68,16 +72,24 @@ public class CalendarFragment extends Fragment implements CalendarView, OnMealDe
         presenter = new CalendarPresenterImpl(repository, this);
 
         selectedDate = getCurrentDate();
-        dateTextView.setText(selectedDate);
-        dateTextView.setOnClickListener(v -> openDatePicker());
-
+        dateTextView.setText(formatDateForDisplay(selectedDate));
         loadMeals(selectedDate);
+
+        calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
+            selectedDate = year + "-" + (month + 1) + "-" + dayOfMonth;
+            dateTextView.setText(formatDateForDisplay(selectedDate));
+            loadMeals(selectedDate);
+        });
 
         return view;
     }
 
     private String getCurrentDate() {
         return new SimpleDateFormat("yyyy-M-d", Locale.getDefault()).format(new Date());
+    }
+
+    private String formatDateForDisplay(String date) {
+        return "Selected Date: " + date;
     }
 
     private void loadMeals(String date) {
@@ -110,17 +122,6 @@ public class CalendarFragment extends Fragment implements CalendarView, OnMealDe
         }
     }
 
-    private void openDatePicker() {
-        MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker().build();
-        datePicker.addOnPositiveButtonClickListener(selection -> {
-            selectedDate = new SimpleDateFormat("yyyy-M-d", Locale.getDefault()).format(new Date(selection));
-            dateTextView.setText(selectedDate);
-            loadMeals(selectedDate);
-        });
-
-        datePicker.show(getParentFragmentManager(), "DATE_PICKER");
-    }
-
     @Override
     public void onMealDelete(ScheduledMeal meal) {
         presenter.deleteScheduledMeal(meal);
@@ -128,5 +129,18 @@ public class CalendarFragment extends Fragment implements CalendarView, OnMealDe
         breakfastAdapter.removeMeal(meal);
         lunchAdapter.removeMeal(meal);
         dinnerAdapter.removeMeal(meal);
+    }
+
+    @Override
+    public void onScheduledMealClick(String mealId) {
+        MealDetailsFragment mealDetailsFragment = new MealDetailsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("MEAL_ID", mealId);
+        mealDetailsFragment.setArguments(bundle);
+
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, mealDetailsFragment)
+                .addToBackStack(null)
+                .commit();
     }
 }
