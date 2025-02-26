@@ -16,6 +16,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.example.mealplannerapp.Home.view.HomeView;
 import com.example.mealplannerapp.R;
@@ -23,12 +26,15 @@ import com.example.mealplannerapp.data.FirestoreDataSource.FirestoreDataSource;
 import com.example.mealplannerapp.data.localDataSource.LocalDataSource;
 import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
 import com.example.mealplannerapp.data.repo.Repository;
+import com.example.mealplannerapp.meal.models.Ingredient;
 import com.example.mealplannerapp.meal.models.Meal;
 import com.example.mealplannerapp.meal.models.MealBy;
 import com.example.mealplannerapp.meal.presenter.MealDetailsPresenter;
 import com.example.mealplannerapp.meal.presenter.MealDetailsPresenterImpl;
 import com.example.mealplannerapp.schedule.model.ScheduledMeal;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,6 +48,10 @@ public class MealDetailsFragment extends Fragment implements HomeView, OnFavMeal
     private String mealId;
     private Meal currentMeal;
     private boolean isGuest;
+
+    private RecyclerView rvIngredients;
+    private IngredientsAdapter ingredientsAdapter;
+    private List<Ingredient> ingredientList = new ArrayList<>();
 
     public MealDetailsFragment() {}
 
@@ -65,6 +75,7 @@ public class MealDetailsFragment extends Fragment implements HomeView, OnFavMeal
                 LocalDataSource.getInstance(requireContext()),
                 new FirestoreDataSource()
         );
+
 
         presenter = new MealDetailsPresenterImpl(this, repository);
 
@@ -116,6 +127,12 @@ public class MealDetailsFragment extends Fragment implements HomeView, OnFavMeal
             }
         });
 
+        rvIngredients = view.findViewById(R.id.rv_ingredients);
+        rvIngredients.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+
+        ingredientsAdapter = new IngredientsAdapter(getContext(), ingredientList);
+        rvIngredients.setAdapter(ingredientsAdapter);
+
         return view;
     }
 
@@ -140,12 +157,15 @@ public class MealDetailsFragment extends Fragment implements HomeView, OnFavMeal
 
             mealName.setText(meal.getStrMeal());
             mealCategoryArea.setText(meal.getStrCategory() + " - " + meal.getStrArea());
-            mealInstructions.setText(meal.getStrInstructions());
+            String formattedInstructions = meal.getStrInstructions().replaceAll("\\. ", ".\n• ");
+            mealInstructions.setText("• " + formattedInstructions);
 
             Glide.with(requireContext())
                     .load(meal.getStrMealThumb())
                     .placeholder(R.drawable.background)
                     .into(mealImage);
+
+            loadIngredients(meal);
         } else {
             Toast.makeText(requireContext(), "No meal found.", Toast.LENGTH_SHORT).show();
         }
@@ -192,6 +212,31 @@ public class MealDetailsFragment extends Fragment implements HomeView, OnFavMeal
         presenter.addToFav(meal);
         presenter.addMealToFirestore(meal);
         Toast.makeText(requireContext(), "Meal added to favorite", Toast.LENGTH_SHORT).show();
+    }
+
+    private void loadIngredients(Meal meal) {
+        ingredientList.clear();
+
+        for (int i = 1; i <= 20; i++) {
+            try {
+                Field ingredientField = Meal.class.getDeclaredField("strIngredient" + i);
+                ingredientField.setAccessible(true);
+                String ingredient = (String) ingredientField.get(meal);
+
+                Field measureField = Meal.class.getDeclaredField("strMeasure" + i);
+                measureField.setAccessible(true);
+                String measure = (String) measureField.get(meal);
+
+                if (ingredient != null && !ingredient.isEmpty()) {
+                    String imageUrl = "https://www.themealdb.com/images/ingredients/" + ingredient + "-Small.png";
+                    ingredientList.add(new Ingredient(ingredient ,  measure , imageUrl));
+                }
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
+        ingredientsAdapter.notifyDataSetChanged();
     }
 
 }

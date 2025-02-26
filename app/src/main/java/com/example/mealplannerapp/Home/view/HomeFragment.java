@@ -28,6 +28,7 @@ import com.example.mealplannerapp.Home.presenter.HomePresenterImpl;
 import com.example.mealplannerapp.data.repo.Repository;
 import com.example.mealplannerapp.meal.models.Meal;
 import com.example.mealplannerapp.meal.models.MealBy;
+import com.example.mealplannerapp.meal.models.OnScheduledMealClickListener;
 import com.example.mealplannerapp.meal.view.MealDetailsFragment;
 import com.example.mealplannerapp.meal.view.OnMealClickListener;
 import com.example.mealplannerapp.schedule.model.ScheduledMeal;
@@ -35,7 +36,7 @@ import com.example.mealplannerapp.search.SearchFragment;
 
 import java.util.List;
 
-public class HomeFragment extends Fragment implements HomeView, LocationMealsAdapter.OnMealClickListener {
+public class HomeFragment extends Fragment implements HomeView, LocationMealsAdapter.OnMealClickListener, OnScheduledMealClickListener {
     private ImageView mealImage, logoutIcon;
     private TextView mealTitle, mealId, usernameTextView;
     private CardView mealCard;
@@ -77,7 +78,7 @@ public class HomeFragment extends Fragment implements HomeView, LocationMealsAda
         locationMealsRecyclerView.setAdapter(locationMealsAdapter);
         scheduledMealsRecyclerView = view.findViewById(R.id.scheduledMealsRecyclerView);
         scheduledMealsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        scheduledMealsAdapter = new ScheduledMealsAdapter();
+        scheduledMealsAdapter = new ScheduledMealsAdapter(this);
         scheduledMealsRecyclerView.setAdapter(scheduledMealsAdapter);
 
         if (getArguments() != null) {
@@ -198,5 +199,18 @@ public class HomeFragment extends Fragment implements HomeView, LocationMealsAda
     @Override
     public void onMealClick(MealBy meal) {
 
+    }
+
+    @Override
+    public void onScheduledMealClick(String mealId) {
+        MealDetailsFragment mealDetailsFragment = new MealDetailsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("MEAL_ID", mealId);
+        mealDetailsFragment.setArguments(bundle);
+
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, mealDetailsFragment)
+                .addToBackStack(null)
+                .commit();
     }
 }

@@ -10,16 +10,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.mealplannerapp.R;
+import com.example.mealplannerapp.meal.models.OnScheduledMealClickListener;
 import com.example.mealplannerapp.schedule.model.OnMealDeleteClickListener;
 import com.example.mealplannerapp.schedule.model.ScheduledMeal;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder> {
     private List<ScheduledMeal> meals;
     private OnMealDeleteClickListener deleteClickListener;
+    private final OnScheduledMealClickListener listener;
 
-    public MealAdapter(OnMealDeleteClickListener deleteClickListener) {
+    public MealAdapter(OnMealDeleteClickListener deleteClickListener, OnScheduledMealClickListener listener) {
+        this.listener = listener;
         this.meals = new ArrayList<>();
         this.deleteClickListener = deleteClickListener;
     }
@@ -65,11 +69,17 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
             super(itemView);
             mealName = itemView.findViewById(R.id.tv_title);
             deleteButton = itemView.findViewById(R.id.delete_btn);
-            mealImage =itemView.findViewById(R.id.iv_meal);
+            mealImage = itemView.findViewById(R.id.iv_meal);
 
             deleteButton.setOnClickListener(v -> {
                 if (deleteClickListener != null && getAdapterPosition() != RecyclerView.NO_POSITION) {
                     deleteClickListener.onMealDelete(meals.get(getAdapterPosition()));
+                }
+            });
+
+            itemView.setOnClickListener(v -> {
+                if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION) {
+                    listener.onScheduledMealClick(meals.get(getAdapterPosition()).getMeal().getIdMeal());
                 }
             });
         }

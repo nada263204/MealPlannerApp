@@ -16,15 +16,17 @@ import com.example.mealplannerapp.data.localDataSource.LocalDataSource;
 import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
 import com.example.mealplannerapp.data.repo.Repository;
 import com.example.mealplannerapp.favorite.model.OnDeleteClickListener;
+import com.example.mealplannerapp.favorite.model.OnFavoriteMealClickListener;
 import com.example.mealplannerapp.favorite.presenter.FavoriteMealPresenter;
 import com.example.mealplannerapp.favorite.presenter.FavoriteMealPresenterImpl;
 import com.example.mealplannerapp.meal.models.Meal;
+import com.example.mealplannerapp.meal.view.MealDetailsFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FavoritesFragment extends Fragment implements OnDeleteClickListener, FavoriteMealView {
+public class FavoritesFragment extends Fragment implements OnDeleteClickListener, FavoriteMealView , OnFavoriteMealClickListener {
 
     private RecyclerView recyclerView;
     private FavoriteMealAdapter favoriteMealAdapter;
@@ -42,7 +44,7 @@ public class FavoritesFragment extends Fragment implements OnDeleteClickListener
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        favoriteMealAdapter = new FavoriteMealAdapter(requireContext(), new ArrayList<>(), this);
+        favoriteMealAdapter = new FavoriteMealAdapter(requireContext(), new ArrayList<>(), this,this::onFavoriteMealClick);
         recyclerView.setAdapter(favoriteMealAdapter);
 
         Repository repository = Repository.getInstance(
@@ -98,5 +100,18 @@ public class FavoritesFragment extends Fragment implements OnDeleteClickListener
     public void onDestroyView() {
         super.onDestroyView();
         presenter = null;
+    }
+
+    @Override
+    public void onFavoriteMealClick(String mealId) {
+        MealDetailsFragment mealDetailsFragment = new MealDetailsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("MEAL_ID", mealId);
+        mealDetailsFragment.setArguments(bundle);
+
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, mealDetailsFragment)
+                .addToBackStack(null)
+                .commit();
     }
 }

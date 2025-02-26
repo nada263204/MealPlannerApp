@@ -19,6 +19,8 @@ import com.example.mealplannerapp.data.FirestoreDataSource.FirestoreDataSource;
 import com.example.mealplannerapp.data.localDataSource.LocalDataSource;
 import com.example.mealplannerapp.data.remoteDataSource.RemoteDataSource;
 import com.example.mealplannerapp.data.repo.Repository;
+import com.example.mealplannerapp.meal.models.OnScheduledMealClickListener;
+import com.example.mealplannerapp.meal.view.MealDetailsFragment;
 import com.example.mealplannerapp.schedule.model.OnMealDeleteClickListener;
 import com.example.mealplannerapp.schedule.presenter.CalendarPresenter;
 import com.example.mealplannerapp.schedule.presenter.CalendarPresenterImpl;
@@ -29,7 +31,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class CalendarFragment extends Fragment implements PlanView, OnMealDeleteClickListener {
+public class CalendarFragment extends Fragment implements PlanView, OnMealDeleteClickListener, OnScheduledMealClickListener {
     private static final String TAG = "CalendarFragment";
 
     private RecyclerView breakfastRecycler, lunchRecycler, dinnerRecycler;
@@ -53,9 +55,9 @@ public class CalendarFragment extends Fragment implements PlanView, OnMealDelete
         lunchRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         dinnerRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        breakfastAdapter = new MealAdapter(this);
-        lunchAdapter = new MealAdapter(this);
-        dinnerAdapter = new MealAdapter(this);
+        breakfastAdapter = new MealAdapter(this,this::onScheduledMealClick);
+        lunchAdapter = new MealAdapter(this,this::onScheduledMealClick);
+        dinnerAdapter = new MealAdapter(this,this::onScheduledMealClick);
 
         breakfastRecycler.setAdapter(breakfastAdapter);
         lunchRecycler.setAdapter(lunchAdapter);
@@ -127,5 +129,18 @@ public class CalendarFragment extends Fragment implements PlanView, OnMealDelete
         breakfastAdapter.removeMeal(meal);
         lunchAdapter.removeMeal(meal);
         dinnerAdapter.removeMeal(meal);
+    }
+
+    @Override
+    public void onScheduledMealClick(String mealId) {
+        MealDetailsFragment mealDetailsFragment = new MealDetailsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("MEAL_ID", mealId);
+        mealDetailsFragment.setArguments(bundle);
+
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, mealDetailsFragment)
+                .addToBackStack(null)
+                .commit();
     }
 }

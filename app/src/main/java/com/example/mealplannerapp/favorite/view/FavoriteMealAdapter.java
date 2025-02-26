@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mealplannerapp.R;
 import com.example.mealplannerapp.favorite.model.OnDeleteClickListener;
+import com.example.mealplannerapp.favorite.model.OnFavoriteMealClickListener;
 import com.example.mealplannerapp.meal.models.Meal;
 import com.squareup.picasso.Picasso;
 
@@ -22,11 +23,15 @@ public class FavoriteMealAdapter extends RecyclerView.Adapter<FavoriteMealAdapte
     private Context context;
     private List<Meal> favoriteList;
     private OnDeleteClickListener onDeleteClickListener;
+    private OnFavoriteMealClickListener onFavoriteMealClickListener;
 
-    public FavoriteMealAdapter(Context context, List<Meal> favoriteList, OnDeleteClickListener onDeleteClickListener) {
+    public FavoriteMealAdapter(Context context, List<Meal> favoriteList,
+                               OnDeleteClickListener onDeleteClickListener,
+                               OnFavoriteMealClickListener onFavoriteMealClickListener) {
         this.context = context;
         this.favoriteList = favoriteList;
         this.onDeleteClickListener = onDeleteClickListener;
+        this.onFavoriteMealClickListener = onFavoriteMealClickListener;
     }
 
     @NonNull
@@ -41,7 +46,12 @@ public class FavoriteMealAdapter extends RecyclerView.Adapter<FavoriteMealAdapte
         Meal meal = favoriteList.get(position);
         holder.title.setText(meal.getStrMeal());
         Picasso.get().load(meal.getStrMealThumb()).into(holder.thumbnail);
+
+        // Remove button click
         holder.btnRemove.setOnClickListener(view -> onDeleteClickListener.onDeleteClick(meal));
+
+        // Item click for favorite meal
+        holder.itemView.setOnClickListener(view -> onFavoriteMealClickListener.onFavoriteMealClick(meal.getIdMeal()));
     }
 
     @Override
@@ -66,5 +76,4 @@ public class FavoriteMealAdapter extends RecyclerView.Adapter<FavoriteMealAdapte
             btnRemove = itemView.findViewById(R.id.delete_btn);
         }
     }
-
 }
